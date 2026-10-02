@@ -1,11 +1,13 @@
 import type {
   AppSettingsDto,
+  BacklogRowDto,
   CalendarDayDto,
   ComplianceDto,
   CompliancePersonDto,
   DashboardDto,
   PersonDayDto,
   PersonDetailDto,
+  PipelineRowDto,
   Profile,
   ReminderRuleDto,
   UserSettingRowDto,
@@ -16,6 +18,7 @@ import { many, one, type PoolClient } from '../db.js';
 import { notFound } from '../errors.js';
 import { METRIC_COLUMNS, readAttachments, readValues } from '../entries/service.js';
 import { buildWeekPlan, listAccounts } from '../abm/service.js';
+import { listTasks } from '../tasks/service.js';
 import { countWeekDays, readTargets } from '../home/routes.js';
 
 const PROFILE_COLUMNS = `
@@ -87,24 +90,69 @@ export async function dashboard(
     });
   }
 
+  const today = (
+    await one<{ today: string }>(client, 'select local_today($1) as today', [adminId])
+  )!.today;
+
   const outcomes = await weekOutcomes(client, monday, 8);
   const impressions = await impressionsTrend(client, monday, 12);
   const tasks = await taskCounts(client);
   const accounts = await listAccounts(client);
   const searchRows = await recentSearchActivities(client, monday);
-  const weekDays = await countWeekDays(client, adminId, monday, monday);
-  const todayCount = await one<{ submitted: number; expected: number }>(
+  const weekDays = await countWeekDays(client, adminId, monday, today);
+  const pipeline = await pipelineRows(client, monday);
+  const backlog = await backlogByPerson(client, people);
+  const overdue = (await listTasks(client, { openOnly: true })).filter((t) => t.isOverdue);
+
+  // Sign-off so far this week.
+  const thisWeekLogs = await one<{ done: number; expected: number }>(
     client,
     `select
-       count(*) filter (where status in ('submitted', 'late'))::int as submitted,
+       count(*) filter (where e.status in ('submitted', 'late'))::int as done,
        count(*)::int as expected
-     from dashboard_compliance($1::date)
-     where status in ('submitted', 'late', 'missing', 'due')`,
+     from profiles p
+     cross join lateral working_days_between(p.id, $1::date, least($2::date, $1::date + 4)) d
+     left join entries e on e.user_id = p.id and e.log_type = 'daily' and e.period_start = d
+     where p.active and p.role = 'contributor'`,
+    [monday, today],
+  );
+
+  // Last week's weekly logs.
+  const weeklyLogs = await one<{ done: number; expected: number }>(
+    client,
+    `select
+       count(*) filter (where e.status in ('submitted', 'late'))::int as done,
+       count(*)::int as expected
+     from profiles p
+     left join entries e on e.user_id = p.id and e.log_type = 'weekly'
+                        and e.period_start = $1::date - 7
+     where p.active and p.role = 'contributor'`,
     [monday],
   );
 
-  const thisWeek = outcomes.find((o) => o.week === monday);
+  // Everything still missing behind the team, oldest first.
+  const missing = await many<{ fullName: string; day: string }>(
+    client,
+    `select p.full_name as "fullName", to_char(d, 'Dy DD Mon') as day
+       from profiles p
+       cross join lateral missing_days(p.id) d
+      where p.active and p.role = 'contributor'
+      order by d`,
+  );
+
   const weekPlan = buildWeekPlan(accounts, monday);
+  const abmWeeksLive: Record<string, number> = {};
+  for (const account of accounts) {
+    abmWeeksLive[account.id] = account.liveAt
+      ? Math.max(
+          0,
+          Math.floor(
+            (Date.parse(`${monday}T00:00:00Z`) - Date.parse(account.liveAt)) /
+              (7 * 24 * 60 * 60 * 1000),
+          ) + 1,
+        )
+      : 0;
+  }
 
   return {
     monday,
@@ -113,22 +161,95 @@ export async function dashboard(
     people: perPerson,
     outcomes,
     impressions,
+    pipeline,
     kpis: {
-      complianceRate:
-        todayCount && todayCount.expected > 0
-          ? Math.round((todayCount.submitted / todayCount.expected) * 100)
-          : 0,
-      submittedToday: todayCount?.submitted ?? 0,
-      peopleCount: people.length,
+      logsDone: thisWeekLogs?.done ?? 0,
+      logsExpected: thisWeekLogs?.expected ?? 0,
+      missingCount: missing.length,
+      missingLabel: missing[0] ? `${missing[0].fullName} · ${missing[0].day}` : null,
       openTasks: tasks.open,
       overdueTasks: tasks.overdue,
-      abmLiveThisWeek: weekPlan.at(-1)?.account?.isLive ?? false,
-      meetingsThisWeek: thisWeek?.meetings ?? 0,
-      repliesThisWeek: thisWeek?.replies ?? 0,
+      weeklyLogsDone: weeklyLogs?.done ?? 0,
+      weeklyLogsExpected: weeklyLogs?.expected ?? 0,
     },
     abm: weekPlan,
+    abmWeeksLive,
+    backlog,
+    overdue,
     searchActivities: searchRows,
   };
+}
+
+/** DSH-03 · "Is it turning into pipeline?": this week beside the week before. */
+export async function pipelineRows(
+  client: PoolClient,
+  monday: string,
+): Promise<PipelineRowDto[]> {
+  const row = await one<Record<string, number>>(
+    client,
+    `with daily as (
+       select week_monday(e.period_start) as week, ev.metric_key, sum(ev.num_value) as total
+         from entries e join entry_values ev on ev.entry_id = e.id
+        where e.log_type = 'daily' and e.status in ('submitted', 'late')
+          and e.period_start between $1::date - 7 and $1::date + 6
+        group by 1, 2),
+     weekly as (
+       select e.period_start as week, ev.metric_key,
+              sum(ev.num_value) as total, avg(ev.num_value) as average
+         from entries e join entry_values ev on ev.entry_id = e.id
+        where e.log_type = 'weekly' and e.status in ('submitted', 'late')
+          and e.period_start in ($1::date, $1::date - 7)
+        group by 1, 2)
+     select
+       coalesce((select total from daily where week = $1::date and metric_key = 'replies'), 0)::int as "repliesThis",
+       coalesce((select total from daily where week = $1::date - 7 and metric_key = 'replies'), 0)::int as "repliesLast",
+       coalesce((select total from weekly where week = $1::date and metric_key = 'wk_meetings'), 0)::int as "meetingsThis",
+       coalesce((select total from weekly where week = $1::date - 7 and metric_key = 'wk_meetings'), 0)::int as "meetingsLast",
+       coalesce((select total from weekly where week = $1::date and metric_key = 'wk_forms'), 0)::int as "formsThis",
+       coalesce((select total from weekly where week = $1::date - 7 and metric_key = 'wk_forms'), 0)::int as "formsLast",
+       coalesce((select round(average) from weekly where week = $1::date and metric_key = 'wk_open_rate'), 0)::int as "openThis",
+       coalesce((select round(average) from weekly where week = $1::date - 7 and metric_key = 'wk_open_rate'), 0)::int as "openLast",
+       coalesce((select total from weekly where week = $1::date and metric_key = 'wk_followers'), 0)::int as "followersThis",
+       coalesce((select total from weekly where week = $1::date - 7 and metric_key = 'wk_followers'), 0)::int as "followersLast"`,
+    [monday],
+  );
+
+  const v = row ?? {};
+  return [
+    { key: 'replies', label: 'Replies', thisWeek: v.repliesThis ?? 0, lastWeek: v.repliesLast ?? 0, unit: 'count' },
+    { key: 'meetings', label: 'Meetings booked', thisWeek: v.meetingsThis ?? 0, lastWeek: v.meetingsLast ?? 0, unit: 'count' },
+    { key: 'forms', label: 'Website form responses', thisWeek: v.formsThis ?? 0, lastWeek: v.formsLast ?? 0, unit: 'count' },
+    { key: 'open_rate', label: 'Email open rate', thisWeek: v.openThis ?? 0, lastWeek: v.openLast ?? 0, unit: 'percent' },
+    { key: 'followers', label: 'Followers at week end', thisWeek: v.followersThis ?? 0, lastWeek: v.followersLast ?? 0, unit: 'count' },
+  ];
+}
+
+/** DSH-05 · the backlog panel, a row per person. */
+export async function backlogByPerson(
+  client: PoolClient,
+  people: Profile[],
+): Promise<BacklogRowDto[]> {
+  const rows = await many<{ userId: string; open: number; overdue: number; done: number }>(
+    client,
+    `select t.assignee_id as "userId",
+            count(*) filter (where t.status not in ('Done', 'Cancelled'))::int as open,
+            count(*) filter (where t.status not in ('Done', 'Cancelled')
+                               and t.due_date < local_today(t.assignee_id))::int as overdue,
+            count(*) filter (where t.status = 'Done'
+                               and t.completed_at > now() - interval '7 days')::int as done
+       from tasks t group by 1`,
+  );
+
+  return people.map((person) => {
+    const row = rows.find((r) => r.userId === person.id);
+    return {
+      userId: person.id,
+      fullName: person.fullName,
+      open: row?.open ?? 0,
+      overdue: row?.overdue ?? 0,
+      done: row?.done ?? 0,
+    };
+  });
 }
 
 /** DSH-03 · outcomes week on week. */
@@ -292,8 +413,6 @@ export async function personDetail(
   const monday = (
     await one<{ m: string }>(client, 'select week_monday($1::date) as m', [today])
   )!.m;
-
-  const { listTasks } = await import('../tasks/service.js');
 
   return {
     profile,

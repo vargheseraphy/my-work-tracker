@@ -562,7 +562,24 @@ describe('the dashboard', () => {
     expect(body.impressions).toHaveLength(12);
     expect(body.outcomes).toHaveLength(8);
     expect(body.impressions.at(-1).week).toBe(monday);
-    expect(body.kpis).toHaveProperty('openTasks');
+    expect(body.kpis).toMatchObject({
+      logsDone: expect.any(Number),
+      logsExpected: expect.any(Number),
+      missingCount: expect.any(Number),
+      openTasks: expect.any(Number),
+      overdueTasks: expect.any(Number),
+      weeklyLogsDone: expect.any(Number),
+      weeklyLogsExpected: expect.any(Number),
+    });
+    expect(body.pipeline.map((row: { key: string }) => row.key)).toEqual([
+      'replies',
+      'meetings',
+      'forms',
+      'open_rate',
+      'followers',
+    ]);
+    expect(body.backlog).toHaveLength(2);
+    expect(Array.isArray(body.overdue)).toBe(true);
   });
 
   it('DSH-06 · shows a person’s recent days with their proof, and unlocks one', async () => {

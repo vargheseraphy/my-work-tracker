@@ -260,24 +260,51 @@ export interface WeekOutcomeDto {
   emails: number;
 }
 
+/** One row of "Is it turning into pipeline?": this week beside the week before. */
+export interface PipelineRowDto {
+  key: string;
+  label: string;
+  thisWeek: number;
+  lastWeek: number;
+  /** 'count' or 'percent', which decides how the change is worded. */
+  unit: 'count' | 'percent';
+}
+
+export interface BacklogRowDto {
+  userId: string;
+  fullName: string;
+  open: number;
+  overdue: number;
+  done: number;
+}
+
 export interface DashboardDto {
   monday: IsoDate;
+  /** Working days of this week already finished, and how many the week holds. */
   weekDaysDone: number;
   weekDaysTotal: number;
   people: DashboardPersonDto[];
   outcomes: WeekOutcomeDto[];
   impressions: { week: IsoDate; total: number }[];
+  pipeline: PipelineRowDto[];
   kpis: {
-    complianceRate: number;
-    submittedToday: number;
-    peopleCount: number;
+    /** Daily logs signed off this week, out of the days expected so far. */
+    logsDone: number;
+    logsExpected: number;
+    /** Working days behind the team with no entry, and who the oldest one belongs to. */
+    missingCount: number;
+    missingLabel: string | null;
     openTasks: number;
     overdueTasks: number;
-    abmLiveThisWeek: boolean;
-    meetingsThisWeek: number;
-    repliesThisWeek: number;
+    /** Last week's weekly logs. */
+    weeklyLogsDone: number;
+    weeklyLogsExpected: number;
   };
   abm: AbmWeekPlanDto[];
+  /** Weeks each account has been live, keyed by account id. */
+  abmWeeksLive: Record<string, number>;
+  backlog: BacklogRowDto[];
+  overdue: TaskDto[];
   searchActivities: (SearchActivityDto & { userName: string; week: IsoDate })[];
 }
 
