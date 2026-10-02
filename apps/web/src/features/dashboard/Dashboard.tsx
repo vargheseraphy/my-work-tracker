@@ -6,8 +6,10 @@ import { useQuery } from '@tanstack/react-query';
 import {
   addDays,
   formatNumber,
+  formatMonth,
   formatWeek,
   formatWeekRange,
+  monthStart,
   growth,
   formatGrowth,
   pace,
@@ -35,7 +37,8 @@ import {
 export function Dashboard() {
   const user = useUser();
   const [monday, setMonday] = useState(() => weekMonday(user.today));
-  const month = monday.slice(0, 7);
+  // The grid has its own month, because a week can straddle a month end.
+  const [month, setMonth] = useState(() => user.today.slice(0, 7));
 
   const week = useQuery({
     queryKey: ['admin', 'week', monday],
@@ -116,7 +119,22 @@ export function Dashboard() {
       </div>
 
       <Card as="section">
-        <CardHead title="Daily sign-off" sub={`${month}`} />
+        <CardHead
+          title="Daily sign-off"
+          actions={
+            <div className="row">
+              <Button small onClick={() => setMonth(shiftMonth(month, -1))}>
+                Previous month
+              </Button>
+              <span className="small muted" style={{ minWidth: 120, textAlign: 'center' }}>
+                {formatMonth(month)}
+              </span>
+              <Button small onClick={() => setMonth(shiftMonth(month, 1))}>
+                Next month
+              </Button>
+            </div>
+          }
+        />
         {compliance.isPending ? (
           <Loading />
         ) : compliance.data ? (
@@ -271,4 +289,10 @@ export function Dashboard() {
       </div>
     </>
   );
+}
+
+function shiftMonth(month: string, by: number): string {
+  const date = new Date(`${monthStart(month)}T00:00:00Z`);
+  date.setUTCMonth(date.getUTCMonth() + by);
+  return date.toISOString().slice(0, 7);
 }

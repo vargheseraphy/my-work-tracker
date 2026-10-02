@@ -5,7 +5,7 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { z } from 'zod';
 
 const bool = z
@@ -63,12 +63,32 @@ export interface Config extends RawConfig {
   isTest: boolean;
 }
 
-/** Reads .env without overwriting anything already set in the environment. */
+/**
+ * Reads .env without overwriting anything already set in the environment.
+ * There is one .env at the top of the repository, and `npm run dev` starts each workspace in its
+ * own folder, so the search walks up until it finds one.
+ */
+let repoRoot: string | undefined;
+
+/** Where the .env was found: the top of the repository, and what relative paths resolve against. */
+export function rootDir(): string {
+  return repoRoot ?? process.cwd();
+}
+
 export function loadDotEnv(dir = process.cwd()): void {
-  for (const name of ['.env']) {
+  const candidates: string[] = [];
+  let current = resolve(dir);
+  for (let level = 0; level < 5; level += 1) {
+    candidates.push(resolve(current, '.env'));
+    const parent = dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+
+  for (const path of candidates) {
     let text: string;
     try {
-      text = readFileSync(resolve(dir, name), 'utf8');
+      text = readFileSync(path, 'utf8');
     } catch {
       continue;
     }
@@ -86,6 +106,8 @@ export function loadDotEnv(dir = process.cwd()): void {
       }
       process.env[key] = value;
     }
+    repoRoot = dirname(path);
+    return;
   }
 }
 
@@ -123,7 +145,7 @@ export function buildConfig(env: NodeJS.ProcessEnv = process.env): Config {
     allowedEmailDomains: raw.ALLOWED_EMAIL_DOMAINS.split(',')
       .map((d) => d.trim().toLowerCase())
       .filter(Boolean),
-    uploadDir: resolve(process.cwd(), raw.UPLOAD_DIR),
+    uploadDir: resolve(rootDir(), raw.UPLOAD_DIR),
     isProduction: raw.NODE_ENV === 'production',
     isTest,
   };
