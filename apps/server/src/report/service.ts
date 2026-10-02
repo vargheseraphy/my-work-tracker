@@ -108,22 +108,21 @@ export async function buildReport(client: PoolClient, monday: string): Promise<R
     });
   }
 
-  const [totals, previousTotals, accounts, tasks, searchRows] = await Promise.all([
-    weekTotals(client, monday),
-    weekTotals(client, addDays(monday, -7)),
-    listAccounts(client),
-    taskCounts(client),
-    many<ReportDto['searchActivities'][number]>(
-      client,
-      `select sa.id, sa.kind, sa.description, sa.link, p.full_name as "userName"
-         from search_activities sa
-         join entries e on e.id = sa.entry_id
-         join profiles p on p.id = e.user_id
-        where e.period_start = $1
-        order by p.full_name, sa.kind`,
-      [monday],
-    ),
-  ]);
+  // One connection runs one query at a time, so these are sequential on purpose.
+  const totals = await weekTotals(client, monday);
+  const previousTotals = await weekTotals(client, addDays(monday, -7));
+  const accounts = await listAccounts(client);
+  const tasks = await taskCounts(client);
+  const searchRows = await many<ReportDto['searchActivities'][number]>(
+    client,
+    `select sa.id, sa.kind, sa.description, sa.link, p.full_name as "userName"
+       from search_activities sa
+       join entries e on e.id = sa.entry_id
+       join profiles p on p.id = e.user_id
+      where e.period_start = $1
+      order by p.full_name, sa.kind`,
+    [monday],
+  );
 
   return {
     monday,

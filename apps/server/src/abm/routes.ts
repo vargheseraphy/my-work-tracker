@@ -21,11 +21,10 @@ export async function abmRoutes(app: FastifyInstance): Promise<void> {
   app.get('/abm', async (request) => {
     const user = requireUser(request);
     return withUser(user.id, async (client): Promise<AbmScreenDto> => {
-      const [accounts, touches, week] = await Promise.all([
-        listAccounts(client),
-        listTouches(client),
-        currentWeek(client, user.id),
-      ]);
+      // One connection runs one query at a time, so these are sequential on purpose.
+      const accounts = await listAccounts(client);
+      const touches = await listTouches(client);
+      const week = await currentWeek(client, user.id);
       return { accounts, touches, currentWeek: week, weekPlan: buildWeekPlan(accounts, week) };
     });
   });

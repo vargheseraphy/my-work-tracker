@@ -52,12 +52,11 @@ export async function readEntry(client: PoolClient, entryId: string): Promise<En
   );
   if (!row) throw notFound();
 
-  const [values, attachments, searchActivities, abmAccountIds] = await Promise.all([
-    readValues(client, entryId),
-    readAttachments(client, { entryId }),
-    readSearchActivities(client, entryId),
-    readAbmPicks(client, entryId),
-  ]);
+  // One connection runs one query at a time, so these are sequential on purpose.
+  const values = await readValues(client, entryId);
+  const attachments = await readAttachments(client, { entryId });
+  const searchActivities = await readSearchActivities(client, entryId);
+  const abmAccountIds = await readAbmPicks(client, entryId);
 
   return {
     ...row,

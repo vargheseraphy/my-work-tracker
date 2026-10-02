@@ -77,32 +77,31 @@ export async function dashboard(
     (p) => p.active && p.role === 'contributor',
   );
 
-  const perPerson = await Promise.all(
-    people.map(async (p) => ({
+  // One connection runs one query at a time, so everything here is sequential on purpose.
+  const perPerson = [];
+  for (const p of people) {
+    perPerson.push({
       userId: p.id,
       fullName: p.fullName,
       targets: await readTargets(client, p.id, monday),
-    })),
-  );
+    });
+  }
 
-  const [outcomes, impressions, tasks, accounts, searchRows, weekDays, todayCount] =
-    await Promise.all([
-      weekOutcomes(client, monday, 8),
-      impressionsTrend(client, monday, 12),
-      taskCounts(client),
-      listAccounts(client),
-      recentSearchActivities(client, monday),
-      countWeekDays(client, adminId, monday, monday),
-      one<{ submitted: number; expected: number }>(
-        client,
-        `select
-           count(*) filter (where status in ('submitted', 'late'))::int as submitted,
-           count(*)::int as expected
-         from dashboard_compliance($1::date)
-         where status in ('submitted', 'late', 'missing', 'due')`,
-        [monday],
-      ),
-    ]);
+  const outcomes = await weekOutcomes(client, monday, 8);
+  const impressions = await impressionsTrend(client, monday, 12);
+  const tasks = await taskCounts(client);
+  const accounts = await listAccounts(client);
+  const searchRows = await recentSearchActivities(client, monday);
+  const weekDays = await countWeekDays(client, adminId, monday, monday);
+  const todayCount = await one<{ submitted: number; expected: number }>(
+    client,
+    `select
+       count(*) filter (where status in ('submitted', 'late'))::int as submitted,
+       count(*)::int as expected
+     from dashboard_compliance($1::date)
+     where status in ('submitted', 'late', 'missing', 'due')`,
+    [monday],
+  );
 
   const thisWeek = outcomes.find((o) => o.week === monday);
   const weekPlan = buildWeekPlan(accounts, monday);
@@ -250,7 +249,7 @@ export async function personDetail(
 
   const workingDays = await many<{ d: string }>(
     client,
-    'select d from working_days_between($1, $2::date - $3, $2::date) d order by d desc',
+    'select d from working_days_between($1, $2::date - $3::int, $2::date) d order by d desc',
     [userId, today, days * 2],
   );
 
@@ -262,7 +261,7 @@ export async function personDetail(
   }>(
     client,
     `select id, period_start as "periodStart", status, is_late as "isLate"
-       from entries where user_id = $1 and log_type = 'daily' and period_start >= $2::date - $3`,
+       from entries where user_id = $1 and log_type = 'daily' and period_start >= $2::date - $3::int`,
     [userId, today, days * 2],
   );
 
@@ -287,7 +286,8 @@ export async function personDetail(
   );
 
   const { readEntry } = await import('../entries/service.js');
-  const weeklyEntries = await Promise.all(weeklyIds.map((w) => readEntry(client, w.id)));
+  const weeklyEntries = [];
+  for (const w of weeklyIds) weeklyEntries.push(await readEntry(client, w.id));
 
   const monday = (
     await one<{ m: string }>(client, 'select week_monday($1::date) as m', [today])
@@ -327,24 +327,25 @@ export async function readSettings(client: PoolClient): Promise<{
   reminders: ReminderRuleDto[];
   app: AppSettingsDto;
 }> {
-  const [settings, metrics, reminders, appRows] = await Promise.all([
-    many<UserSettingRowDto>(
-      client,
-      `select user_id as "userId", metric_key as "metricKey", enabled,
-              weekly_target as "weeklyTarget" from user_metric_settings`,
-    ),
-    many<MetricDefinition>(
-      client,
-      `select ${METRIC_COLUMNS} from metric_definitions md where md.active order by md.sort_order`,
-    ),
-    many<ReminderRuleDto>(
-      client,
-      `select key, description, to_char(local_time, 'HH24:MI') as "localTime", dow,
-              to_admin as "toAdmin", email, in_app as "inApp", active
-         from reminder_rules order by local_time, key`,
-    ),
-    many<{ key: string; value: unknown }>(client, 'select key, value from app_settings'),
-  ]);
+  const settings = await many<UserSettingRowDto>(
+    client,
+    `select user_id as "userId", metric_key as "metricKey", enabled,
+            weekly_target as "weeklyTarget" from user_metric_settings`,
+  );
+  const metrics = await many<MetricDefinition>(
+    client,
+    `select ${METRIC_COLUMNS} from metric_definitions md where md.active order by md.sort_order`,
+  );
+  const reminders = await many<ReminderRuleDto>(
+    client,
+    `select key, description, to_char(local_time, 'HH24:MI') as "localTime", dow,
+            to_admin as "toAdmin", email, in_app as "inApp", active
+       from reminder_rules order by local_time, key`,
+  );
+  const appRows = await many<{ key: string; value: unknown }>(
+    client,
+    'select key, value from app_settings',
+  );
 
   const raw = Object.fromEntries(appRows.map((r) => [r.key, r.value]));
   return {

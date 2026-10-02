@@ -19,27 +19,25 @@ export async function homeRoutes(app: FastifyInstance): Promise<void> {
       const today = await localToday(client, user.id);
       const monday = weekMonday(today);
 
-      const [missing, backfill, todayEntry, weeklyEntry, openTasks, owned, targets, weekDays] =
-        await Promise.all([
-          missingDays(client, user.id),
-          backfillDays(client, user.id),
-          one<{ status: string }>(
-            client,
-            `select status from entries
-              where user_id = $1 and log_type = 'daily' and period_start = $2`,
-            [user.id, today],
-          ),
-          one<{ status: string }>(
-            client,
-            `select status from entries
-              where user_id = $1 and log_type = 'weekly' and period_start = $2`,
-            [user.id, monday],
-          ),
-          listTasks(client, { assigneeId: user.id, openOnly: true }),
-          readOwnedAbmAccounts(client, user.id),
-          readTargets(client, user.id, monday),
-          countWeekDays(client, user.id, monday, today),
-        ]);
+      // One connection runs one query at a time, so these are sequential on purpose.
+      const missing = await missingDays(client, user.id);
+      const backfill = await backfillDays(client, user.id);
+      const todayEntry = await one<{ status: string }>(
+        client,
+        `select status from entries
+          where user_id = $1 and log_type = 'daily' and period_start = $2`,
+        [user.id, today],
+      );
+      const weeklyEntry = await one<{ status: string }>(
+        client,
+        `select status from entries
+          where user_id = $1 and log_type = 'weekly' and period_start = $2`,
+        [user.id, monday],
+      );
+      const openTasks = await listTasks(client, { assigneeId: user.id, openOnly: true });
+      const owned = await readOwnedAbmAccounts(client, user.id);
+      const targets = await readTargets(client, user.id, monday);
+      const weekDays = await countWeekDays(client, user.id, monday, today);
 
       const weeklyOpen = await one<{ isOpen: boolean }>(
         client,

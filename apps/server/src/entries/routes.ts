@@ -210,18 +210,15 @@ async function buildScreen(
   type: 'daily' | 'weekly',
   period: string,
 ): Promise<EntryScreenDto> {
-  const [entry, fields, today, settings] = await Promise.all([
-    readEntry(client, entryId),
-    readFields(client, userId, type),
-    localToday(client, userId),
-    appSettings(client),
-  ]);
+  // One connection runs one query at a time, so these are sequential on purpose.
+  const entry = await readEntry(client, entryId);
+  const fields = await readFields(client, userId, type);
+  const today = await localToday(client, userId);
+  const settings = await appSettings(client);
 
-  const [missing, backfill, inWindow] = await Promise.all([
-    missingDays(client, userId),
-    backfillDays(client, userId),
-    withinBackfill(client, userId, period),
-  ]);
+  const missing = await missingDays(client, userId);
+  const backfill = await backfillDays(client, userId);
+  const inWindow = await withinBackfill(client, userId, period);
 
   const base: EntryScreenDto = {
     entry,
@@ -239,23 +236,21 @@ async function buildScreen(
 
   if (type === 'weekly') {
     const monday = weekMonday(period);
-    const [autoTotals, owned, openCheck, previous] = await Promise.all([
-      weekAutoTotals(client, userId, monday),
-      readOwnedAbmAccounts(client, userId),
-      one<{ isOpen: boolean }>(
-        client,
-        `select local_now($1) >= ($2::date + 4 + coalesce((setting('weekly_open_time') #>> '{}')::time, '16:00')) as "isOpen"`,
-        [userId, monday],
-      ),
-      one<{ followers: number | null }>(
-        client,
-        `select ev.num_value as followers
-           from entries e join entry_values ev on ev.entry_id = e.id
-          where e.user_id = $1 and e.log_type = 'weekly' and e.period_start = $2::date - 7
-            and ev.metric_key = 'wk_followers'`,
-        [userId, monday],
-      ),
-    ]);
+    const autoTotals = await weekAutoTotals(client, userId, monday);
+    const owned = await readOwnedAbmAccounts(client, userId);
+    const openCheck = await one<{ isOpen: boolean }>(
+      client,
+      `select local_now($1) >= ($2::date + 4 + coalesce((setting('weekly_open_time') #>> '{}')::time, '16:00')) as "isOpen"`,
+      [userId, monday],
+    );
+    const previous = await one<{ followers: number | null }>(
+      client,
+      `select ev.num_value as followers
+         from entries e join entry_values ev on ev.entry_id = e.id
+        where e.user_id = $1 and e.log_type = 'weekly' and e.period_start = $2::date - 7
+          and ev.metric_key = 'wk_followers'`,
+      [userId, monday],
+    );
 
     base.autoTotals = autoTotals;
     base.weeklyIsOpen = openCheck?.isOpen ?? false;

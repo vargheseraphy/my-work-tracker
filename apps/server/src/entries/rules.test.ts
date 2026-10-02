@@ -493,7 +493,8 @@ describe('lateness', () => {
     const opened = await agent.post('/api/entries/open', { type: 'daily', period: yesterday });
     const screen = opened.json() as EntryScreenDto;
     await fillZeroes(agent, screen);
-    expect((await submit(agent, screen.entry.id)).status).toBe('late');
+    const first = await submit(agent, screen.entry.id);
+    expect(first).toEqual({ ok: true, status: 'late' });
 
     await adminAgent.post('/api/admin/unlock', {
       userId: user.id,
