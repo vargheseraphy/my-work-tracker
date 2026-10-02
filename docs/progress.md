@@ -5,17 +5,17 @@ Claude updates this file at the end of every phase. Status: Not started, In prog
 | Phase | Status | What was built | Tests (passed / total) | Commit |
 | --- | --- | --- | --- | --- |
 | 0 Preflight | Done | Homebrew PostgreSQL 16.15 and Mailpit running; `gtm`, `gtm_test` and `gtm_verify` created and migrated; `.env` written with generated secrets; `gtm_app` login set | 15 / 15 database checks | `P0: preflight, database migrated and verified` |
-| 1 Monorepo and tooling | Not started | | | |
-| 2 Server core and auth | Not started | | | |
-| 3 Server features | Not started | | | |
-| 4 Email and jobs | Not started | | | |
+| 1 Monorepo and tooling | Done | npm workspaces, shared package, server and web skeletons, migration runner, seed, scripts, ESLint and Vitest | 68 / 68 shared | `P1: ...` |
+| 2 Server core and auth | Done | withUser and asApp, argon2 sign in, sessions, lockout, invites, resets, CSRF, security headers, role guards | 30 / 30 auth | `P2: ...` |
+| 3 Server features | Done | Entries, files, tasks, ABM, notifications, admin, dashboard, person detail, settings, calendar, users, report, CSV | 121 / 121 rules, access and routes | `P3: ...` |
+| 4 Email and jobs | Done | Branded email layout, SMTP transport, reminder job, Monday report job, node-cron scheduler | 9 / 9 against Mailpit | `P4: ...` |
 | 5 Web shell and components | Not started | | | |
 | 6 Contributor screens | Not started | | | |
 | 7 Manager screens | Not started | | | |
 | 8 Finish and verify | Not started | | | |
 
 ## Last `npm run verify`
-Not run yet.
+Shared and server suites: 228 passed, 0 failed (10 files). Lint, types, and browser journeys still to run.
 
 ## Local accounts
 Invented test logins created by the seed. Local only. Not real people.
