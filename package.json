@@ -30,6 +30,7 @@
     "jobs:run-now": "tsx scripts/jobs-run-now.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.5",
     "@types/node-cron": "^3.0.11",

@@ -426,6 +426,11 @@ async function main(): Promise<void> {
   }
   console.log('\nThese are also written to docs/progress.md under "Local accounts".');
   await writeLogins(logins);
+
+  // The browser journeys need to sign in, so the logins go to a git-ignored file as well.
+  const accountsPath = resolve(uploadDir, '..', 'seed-accounts.json');
+  await mkdir(dirname(accountsPath), { recursive: true });
+  await writeFile(accountsPath, JSON.stringify(logins, null, 2), { mode: 0o600 });
 }
 
 async function addProof(
