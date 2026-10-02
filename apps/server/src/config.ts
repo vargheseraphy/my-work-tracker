@@ -41,6 +41,9 @@ const schema = z.object({
   REPORT_CRON: z.string().min(1).default('0 9 * * 1'),
   REPORT_TIMEZONE: z.string().min(1).default('Asia/Kolkata'),
 
+  /** Auth requests allowed per IP per 15 minutes (docs/TECH_SPEC.md "Auth"). */
+  AUTH_RATE_LIMIT: z.coerce.number().int().min(1).max(100_000).default(20),
+
   ALLOWED_EMAIL_DOMAINS: z.string().default(''),
   INVITE_TOKEN_HOURS: z.coerce.number().int().min(1).max(24 * 30).default(48),
   RESET_TOKEN_HOURS: z.coerce.number().int().min(1).max(72).default(1),

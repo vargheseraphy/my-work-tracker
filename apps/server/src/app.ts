@@ -44,7 +44,6 @@ export async function buildApp(): Promise<FastifyInstance> {
     },
     bodyLimit: 1_048_576,
     trustProxy: false,
-    disableRequestLogging: cfg.isTest,
   });
 
   await app.register(cookie, { secret: cfg.SESSION_SECRET });
@@ -70,7 +69,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(
     async (instance) => {
       await instance.register(rateLimit, {
-        max: 20,
+        max: cfg.AUTH_RATE_LIMIT,
         timeWindow: '15 minutes',
         keyGenerator: (request) => request.ip,
       });
