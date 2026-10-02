@@ -17,8 +17,8 @@ test.describe('J8 · the admin dashboard', () => {
   test('the grid shows a late day, and targets show pace in words', async ({ page }) => {
     await signIn(page, 'Raphy');
 
-    await expect(page.getByRole('heading', { name: 'GTM dashboard' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Daily sign-off' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'GTM team dashboard' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Did everyone log?' })).toBeVisible();
 
     // The seed makes two of Anil's days late; they may be in the month before this one.
     const lateCell = page.getByTitle(/: Late$/);
@@ -34,7 +34,7 @@ test.describe('J8 · the admin dashboard', () => {
 
   test('a viewer reads the dashboard but gets no admin menu', async ({ page }) => {
     await signIn(page, 'Leadership');
-    await expect(page.getByRole('heading', { name: 'GTM dashboard' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'GTM team dashboard' })).toBeVisible();
 
     const nav = page.getByRole('navigation', { name: 'Main' });
     await expect(nav.getByRole('link', { name: 'Task management' })).toHaveCount(0);

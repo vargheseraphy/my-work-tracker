@@ -22,11 +22,11 @@ Invented test logins created by the seed. Local only. Not real people.
 
 | Role | Email | Password |
 | --- | --- | --- |
-| Raphy | raphy@example.test | lantern-willow-23ea |
-| Tanzil | tanzil@example.test | summit-summit-d6ec |
-| Anil | anil@example.test | amber-amber-b152 |
-| Tamre | tamre@example.test | lantern-lantern-3428 |
-| Leadership | viewer@example.test | lantern-harbour-0e9d |
+| Raphy | raphy@example.test | amber-quartz-b73c |
+| Tanzil | tanzil@example.test | summit-pebble-f3c2 |
+| Anil | anil@example.test | lantern-harbour-8ca7 |
+| Tamre | tamre@example.test | pebble-meadow-f5ce |
+| Leadership | viewer@example.test | summit-meadow-15b7 |
 
 ## Open items
 None yet.
