@@ -215,30 +215,13 @@ export async function createUser(input: {
     });
   }
 
+  // `authenticated` has no insert on profiles, and gtm_app inherits that, so the account is
+  // created through public.create_account() (db/migrations/0006). Only gtm_app may call it.
   return asApp(async (client) => {
-    const existing = await one<{ id: string }>(
+    const row = await one<{ id: string }>(
       client,
-      'select id from auth.users where email = $1',
-      [input.email],
-    );
-    if (existing) {
-      throw new HttpError(409, { error: 'rule', message: 'That person already has an account' });
-    }
-
-    const user = await one<{ id: string }>(
-      client,
-      'insert into auth.users (email) values ($1) returning id',
-      [input.email],
-    );
-    const id = user!.id;
-
-    // profiles is admin-only through RLS, so the insert runs as gtm_app, which RLS does not
-    // apply to for this schema-owner-granted path: the auth module is the only caller.
-    await client.query(
-      `insert into public.profiles (id, email, full_name, role, timezone, work_days, start_date)
-       values ($1, $2, $3, $4, $5, coalesce($6::smallint[], '{1,2,3,4,5}'), coalesce($7::date, current_date))`,
+      'select public.create_account($1, $2, $3, $4, $5::smallint[], $6::date) as id',
       [
-        id,
         input.email,
         input.fullName,
         input.role,
@@ -247,7 +230,7 @@ export async function createUser(input: {
         input.startDate ?? null,
       ],
     );
-    return { id };
+    return { id: row!.id };
   });
 }
 
