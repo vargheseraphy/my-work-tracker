@@ -1,0 +1,47 @@
+{
+  "name": "gtm-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Yallo GTM Tracker: daily and weekly activity logging with proof, reminders and a manager dashboard.",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c cyan,magenta \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "npm run dev --workspace @gtm/server",
+    "dev:web": "npm run dev --workspace @gtm/web",
+    "build": "npm run build --workspace @gtm/shared && npm run build --workspace @gtm/server && npm run build --workspace @gtm/web",
+    "lint": "eslint .",
+    "typecheck": "tsc -b --force",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run e2e",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:setup": "tsx scripts/db-setup.ts",
+    "db:reset": "tsx scripts/db-reset.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:verify": "tsx scripts/db-verify.ts",
+    "user:create": "tsx scripts/user-create.ts",
+    "jobs:run-now": "tsx scripts/jobs-run-now.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.5",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "concurrently": "^9.1.2",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}
