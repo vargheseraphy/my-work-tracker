@@ -9,6 +9,7 @@ import {
   type ComplianceStatus,
   type IsoDate,
 } from '@gtm/shared';
+import { Scrollable } from './ui.jsx';
 
 // ---------- table ----------
 export interface Column<T> {
@@ -36,7 +37,7 @@ export function DataTable<T>({
   if (rows.length === 0) return <p className="empty">{empty}</p>;
 
   return (
-    <div className="table-wrap">
+    <Scrollable label={caption}>
       <table className="table">
         <caption className="sr-only">{caption}</caption>
         <thead>
@@ -64,7 +65,7 @@ export function DataTable<T>({
           ))}
         </tbody>
       </table>
-    </div>
+    </Scrollable>
   );
 }
 
@@ -131,7 +132,7 @@ export function ComplianceGrid({ data }: { data: ComplianceDto }) {
 
   return (
     <div className="stack">
-      <div className="table-wrap">
+      <Scrollable label={`Daily sign-off for ${data.month}`}>
         <div className="cgrid" style={{ gridTemplateColumns: columns, minWidth: 720 }}>
           <div className="c hd" />
           {data.days.map((day) => (
@@ -144,7 +145,7 @@ export function ComplianceGrid({ data }: { data: ComplianceDto }) {
             <Row key={person.userId} person={person} days={data.days} />
           ))}
         </div>
-      </div>
+      </Scrollable>
 
       <div className="legend">
         <span>

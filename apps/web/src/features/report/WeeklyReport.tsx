@@ -24,6 +24,7 @@ import {
   PaceDot,
   PageHead,
   Pill,
+  Scrollable,
 } from '../../components/ui.jsx';
 
 export function WeeklyReport() {
@@ -94,7 +95,7 @@ export function WeeklyReport() {
 
       <Card as="section">
         <CardHead title="The week in numbers" sub="Compared with the week before" />
-        <div className="table-wrap">
+        <Scrollable label="Weekly totals">
           <table className="table">
             <caption className="sr-only">Weekly totals</caption>
             <thead>
@@ -130,7 +131,7 @@ export function WeeklyReport() {
               ))}
             </tbody>
           </table>
-        </div>
+        </Scrollable>
       </Card>
 
       <Card as="section">

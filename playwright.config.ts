@@ -38,13 +38,24 @@ export default defineConfig({
     },
   ],
 
-  // Start the server and the web app if they are not already running.
+  /**
+   * Playwright starts its own pair of servers rather than reusing a running one, because the
+   * suite signs in far more often than the real limit of 20 auth requests per 15 minutes allows.
+   * The limit itself is unchanged in .env and is tested on its own in
+   * apps/server/src/auth/rate-limit.test.ts.
+   */
   webServer: {
     command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: true,
+    url: 'http://localhost:5173/api/health',
+    reuseExistingServer: false,
     timeout: 120_000,
     stdout: 'ignore',
     stderr: 'pipe',
+    env: {
+      ...process.env,
+      AUTH_RATE_LIMIT: '100000',
+      // Reminder emails during a browser run would just add noise.
+      JOBS_ENABLED: 'false',
+    } as Record<string, string>,
   },
 });

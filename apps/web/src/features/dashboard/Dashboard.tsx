@@ -32,6 +32,7 @@ import {
   PageHead,
   Pill,
   StatCard,
+  Scrollable,
 } from '../../components/ui.jsx';
 
 export function Dashboard() {
@@ -199,7 +200,7 @@ export function Dashboard() {
       <div className="grid g2">
         <Card as="section">
           <CardHead title="Outcomes week on week" sub="Last 8 weeks" />
-          <div className="table-wrap">
+          <Scrollable label="Outcomes week on week">
             <table className="table">
               <caption className="sr-only">Outcomes week on week</caption>
               <thead>
@@ -231,7 +232,7 @@ export function Dashboard() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </Scrollable>
         </Card>
 
         <Card as="section">

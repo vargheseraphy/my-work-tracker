@@ -28,6 +28,7 @@ import {
   Loading,
   PageHead,
   Pill,
+  Scrollable,
 } from '../../components/ui.jsx';
 
 export function AbmTracker() {
@@ -83,7 +84,7 @@ export function AbmTracker() {
           title="The last 12 weeks"
           sub={`${12 - missedWeeks} of 12 weeks hit`}
         />
-        <div className="table-wrap">
+        <Scrollable label="The last 12 weeks">
           <div className="row" style={{ gap: 8, minWidth: 720 }}>
             {data.weekPlan.map((week) => (
               <div
@@ -96,7 +97,9 @@ export function AbmTracker() {
                   borderColor: week.missed ? 'var(--bad-line)' : 'var(--border)',
                 }}
               >
-                <span className="mono xs faint">{formatWeek(week.week).replace('Week of ', '')}</span>
+                <span className={`mono xs ${week.missed ? 'muted' : 'faint'}`}>
+                  {formatWeek(week.week).replace('Week of ', '')}
+                </span>
                 {week.account ? (
                   <>
                     <b className="small">{week.account.name}</b>
@@ -110,12 +113,12 @@ export function AbmTracker() {
               </div>
             ))}
           </div>
-        </div>
+        </Scrollable>
       </Card>
 
       <Card as="section">
         <CardHead title="Accounts by stage" sub={`${data.accounts.length} accounts`} />
-        <div className="board">
+        <Scrollable label="ABM accounts by stage" className="board">
           {ABM_STAGES.map((stage) => {
             const inStage = data.accounts.filter((a) => a.stage === stage);
             return (
@@ -144,7 +147,7 @@ export function AbmTracker() {
               </div>
             );
           })}
-        </div>
+        </Scrollable>
       </Card>
 
       {openAccount ? (

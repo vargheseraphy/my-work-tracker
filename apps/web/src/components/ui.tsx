@@ -286,3 +286,25 @@ export function Switch({
     </span>
   );
 }
+
+/**
+ * A sideways-scrolling area. It carries tabIndex so a keyboard can scroll it, which is what
+ * axe's "scrollable region must have keyboard access" rule asks for.
+ */
+export function Scrollable({
+  label,
+  className = 'table-wrap',
+  children,
+  style,
+}: {
+  label: string;
+  className?: string;
+  children: ReactNode;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <div className={className} tabIndex={0} role="group" aria-label={label} style={style}>
+      {children}
+    </div>
+  );
+}

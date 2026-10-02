@@ -24,6 +24,7 @@ import {
   Pill,
   Segmented,
   Switch,
+  Scrollable,
 } from '../../components/ui.jsx';
 
 interface SettingsScreen {
@@ -119,7 +120,7 @@ function Targets({ data, people }: { data: SettingsScreen; people: Profile[] }) 
   return (
     <Card as="section">
       <CardHead title="Weekly targets" sub="Per person, per measure" />
-      <div className="table-wrap">
+      <Scrollable label="Weekly targets per person">
         <table className="table">
           <caption className="sr-only">Weekly targets per person</caption>
           <thead>
@@ -160,7 +161,7 @@ function Targets({ data, people }: { data: SettingsScreen; people: Profile[] }) 
             ))}
           </tbody>
         </table>
-      </div>
+      </Scrollable>
       <Button tone="primary" onClick={() => save.mutate()} disabled={save.isPending}>
         {save.isPending ? 'Saving…' : 'Save the targets'}
       </Button>
@@ -188,7 +189,7 @@ function Fields({ data, people }: { data: SettingsScreen; people: Profile[] }) {
   return (
     <Card as="section">
       <CardHead title="Fields each person logs" sub="Switch a field off and it leaves their next log" />
-      <div className="table-wrap">
+      <Scrollable label="Which fields each person logs">
         <table className="table">
           <caption className="sr-only">Which fields each person logs</caption>
           <thead>
@@ -231,7 +232,7 @@ function Fields({ data, people }: { data: SettingsScreen; people: Profile[] }) {
               ))}
           </tbody>
         </table>
-      </div>
+      </Scrollable>
     </Card>
   );
 }
@@ -283,7 +284,7 @@ function Reminders({ data }: { data: SettingsScreen }) {
     <>
       <Card as="section">
         <CardHead title="Reminder times" sub="In each person's own time zone" />
-        <div className="table-wrap">
+        <Scrollable label="Reminder rules">
           <table className="table">
             <caption className="sr-only">Reminder rules</caption>
             <thead>
@@ -344,7 +345,7 @@ function Reminders({ data }: { data: SettingsScreen }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </Scrollable>
         <Button tone="primary" onClick={() => save.mutate()} disabled={save.isPending}>
           {save.isPending ? 'Saving…' : 'Save the reminders'}
         </Button>
@@ -396,7 +397,7 @@ function Users({ people }: { people: Profile[] }) {
           </Button>
         }
       />
-      <div className="table-wrap">
+      <Scrollable label="People with accounts">
         <table className="table">
           <caption className="sr-only">People with accounts</caption>
           <thead>
@@ -431,7 +432,7 @@ function Users({ people }: { people: Profile[] }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </Scrollable>
       <p className="xs faint">
         Switching someone off ends their sessions straight away and stops them signing in.
       </p>
