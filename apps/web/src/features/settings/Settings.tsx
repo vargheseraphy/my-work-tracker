@@ -173,18 +173,35 @@ function Targets({ data, people }: { data: SettingsScreen; people: Profile[] }) 
 function Fields({ data, people }: { data: SettingsScreen; people: Profile[] }) {
   const queryClient = useQueryClient();
   const toast = useToast();
+  // The toggle moves at once and the server catches up; it goes back if the save fails.
+  const [pending, setPending] = useState<Record<string, boolean>>({});
 
   const save = useMutation({
     mutationFn: (row: { userId: string; metricKey: string; enabled: boolean }) =>
       api.put('/admin/settings/fields', { fields: [row] }),
-    onSuccess: () => {
+    onSuccess: async (_result, row) => {
       toast.show('Saved');
-      void queryClient.invalidateQueries({ queryKey: ['admin', 'settings'] });
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'settings'] });
+      setPending((current) => {
+        const next = { ...current };
+        delete next[`${row.userId}:${row.metricKey}`];
+        return next;
+      });
+    },
+    onError: (_error, row) => {
+      toast.show('That could not be saved');
+      setPending((current) => {
+        const next = { ...current };
+        delete next[`${row.userId}:${row.metricKey}`];
+        return next;
+      });
     },
   });
 
   const enabled = (userId: string, metricKey: string) =>
-    data.settings.find((s) => s.userId === userId && s.metricKey === metricKey)?.enabled ?? true;
+    pending[`${userId}:${metricKey}`] ??
+    data.settings.find((s) => s.userId === userId && s.metricKey === metricKey)?.enabled ??
+    true;
 
   return (
     <Card as="section">
@@ -217,14 +234,17 @@ function Fields({ data, people }: { data: SettingsScreen; people: Profile[] }) {
                       <Switch
                         checked={enabled(person.id, metric.key)}
                         label={`${metric.label} for ${person.fullName}`}
-                        disabled={save.isPending}
-                        onChange={(value) =>
+                        onChange={(value) => {
+                          setPending((current) => ({
+                            ...current,
+                            [`${person.id}:${metric.key}`]: value,
+                          }));
                           save.mutate({
                             userId: person.id,
                             metricKey: metric.key,
                             enabled: value,
-                          })
-                        }
+                          });
+                        }}
                       />
                     </td>
                   ))}

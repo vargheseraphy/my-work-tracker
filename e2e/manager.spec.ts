@@ -3,6 +3,16 @@
 import { expect, test } from '@playwright/test';
 import { account, signIn, signOut } from './accounts.js';
 
+/** A weekday a few days back: the seed has filled it in for every contributor. */
+function aPastWorkingDay(): string {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() - 3);
+  while (date.getUTCDay() === 0 || date.getUTCDay() === 6) {
+    date.setUTCDate(date.getUTCDate() - 1);
+  }
+  return date.toISOString().slice(0, 10);
+}
+
 test.describe('J8 · the admin dashboard', () => {
   test('the grid shows a late day, and targets show pace in words', async ({ page }) => {
     await signIn(page, 'Raphy');
@@ -10,8 +20,12 @@ test.describe('J8 · the admin dashboard', () => {
     await expect(page.getByRole('heading', { name: 'GTM dashboard' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Daily sign-off' })).toBeVisible();
 
-    // The seed makes two of Anil's days late.
-    await expect(page.getByTitle(/Late$/).first()).toBeVisible();
+    // The seed makes two of Anil's days late; they may be in the month before this one.
+    const lateCell = page.getByTitle(/: Late$/);
+    if ((await lateCell.count()) === 0) {
+      await page.getByRole('button', { name: 'Previous month' }).click();
+    }
+    await expect(lateCell.first()).toBeVisible();
 
     // Status is never colour alone: the word is there too.
     await expect(page.getByText(/On pace|Close|Behind|No target/).first()).toBeVisible();
@@ -89,20 +103,25 @@ test.describe('J11 · an admin turns a field off for one person', () => {
 
     const row = page.getByRole('row', { name: /Posters created/ });
     await expect(row).toBeVisible();
-    await row.getByLabel('Posters created for Tanzil').uncheck();
-    await expect(page.getByRole('status').filter({ hasText: 'Saved' })).toBeVisible({
-      timeout: 15_000,
-    });
+
+    const toggle = row.getByLabel('Posters created for Tanzil');
+    await expect(toggle).toBeChecked();
+    await toggle.uncheck();
+    await expect(toggle).not.toBeChecked();
+
+    // A day both of them have already logged, so the field list is on screen either way.
+    const day = aPastWorkingDay();
 
     await signOut(page);
     await signIn(page, 'Tanzil');
-    await page.goto('/daily');
+    await page.goto(`/daily/${day}`);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByText('Posters created')).toHaveCount(0);
 
     await signOut(page);
     await signIn(page, 'Tamre');
-    await page.goto('/daily');
-    await expect(page.getByText('Posters created')).toBeVisible();
+    await page.goto(`/daily/${day}`);
+    await expect(page.getByText('Posters created').first()).toBeVisible();
   });
 });
 
@@ -129,11 +148,14 @@ test.describe('J12 · an admin marks a holiday', () => {
     await modal.getByLabel('Label').fill('Founders day');
     await modal.getByRole('button', { name: 'Add it' }).click();
     await expect(modal).toBeHidden({ timeout: 15_000 });
+    await expect(page.getByText('Founders day').first()).toBeVisible();
 
     await signOut(page);
     await signIn(page, 'Tanzil');
     await page.goto('/');
-    await expect(page.getByRole('alert').first()).not.toContainText(dayNumber);
+    // That day is no longer a working day, so nothing points at it any more. There may still be
+    // a banner about some other day, which is why this looks for the day rather than the banner.
+    await expect(page.locator('a[href$="/daily/' + missingDay + '"]')).toHaveCount(0);
   });
 });
 

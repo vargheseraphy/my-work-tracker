@@ -408,10 +408,14 @@
 
 /* ---------- toggles ---------- */
 .switch {
+  /* An inline span ignores width and height, which collapses the toggle to nothing inside a
+     table cell. Only the prototype's flex rows blockified it by accident. */
+  display: inline-block;
   position: relative;
   width: 40px;
   height: 24px;
   flex-shrink: 0;
+  vertical-align: middle;
 }
 .switch input {
   opacity: 0;
