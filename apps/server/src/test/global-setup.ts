@@ -5,7 +5,7 @@
 
 import { resolve } from 'node:path';
 import { loadDotEnv } from '../config.js';
-import { adoptExisting, migrate } from '../../../../scripts/migrate.js';
+import { adoptExisting, migrate } from '../migrations.js';
 
 export default async function setup(): Promise<void> {
   // The repository root, four levels up from apps/server/src/test.
