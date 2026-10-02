@@ -201,10 +201,15 @@ Rebuild each screen from its prototype with live data. Check each at 1440 px and
 7. Commit `P8: release candidate`.
 
 ## Final checklist
-- [ ] `npm run verify` passes, with counts recorded in docs/progress.md
-- [ ] Daily sign-off rules behave exactly as docs/BUSINESS_RULES.md (database tests prove it)
-- [ ] A contributor cannot read another person's data through any API route (tests prove it)
-- [ ] Reminder emails appear in Mailpit once, never twice
-- [ ] All 12 screens built and reachable from the menus; no sample data from the prototypes left in code
-- [ ] No secrets in git (`git log -p | grep -iE "password|secret|api[_-]?key"` shows only names and placeholders)
-- [ ] docs/BLOCKERS.md lists every decision taken without the owner
+- [x] `npm run verify` passes, with counts recorded in docs/progress.md
+      (lint clean, types clean, 228 Vitest, 49 browser journeys, 2 skipped by viewport)
+- [x] Daily sign-off rules behave exactly as docs/BUSINESS_RULES.md (database tests prove it)
+      (apps/server/src/entries/rules.test.ts: one passing and one failing case for each check)
+- [x] A contributor cannot read another person's data through any API route (tests prove it)
+      (apps/server/src/test/access.test.ts, plus the catalogue checks on RLS and search_path)
+- [x] Reminder emails appear in Mailpit once, never twice
+      (apps/server/src/jobs/jobs.test.ts asserts the second run sends nothing)
+- [x] All 12 screens built and reachable from the menus; no sample data from the prototypes left in code
+- [x] No secrets in git (`git log -p | grep -iE "password|secret|api[_-]?key"` shows only the
+      `.env.example` placeholder; `.env` and `data/` are ignored)
+- [x] docs/BLOCKERS.md lists every decision taken without the owner

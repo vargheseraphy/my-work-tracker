@@ -122,10 +122,37 @@ Yes, this works locally. The server has a built-in scheduler that checks every 1
 
 | Command | Does |
 | --- | --- |
-| `docker compose up -d` | Start PostgreSQL and Mailpit |
-| `npm run dev` | Start the server and web app |
-| `npm run db:migrate` | Apply database migrations |
+| `brew services start postgresql@16 mailpit` | Start PostgreSQL and Mailpit. With Docker: `docker compose up -d` |
+| `npm run dev` | Start the server (:3000) and the web app (:5173) |
+| `npm run db:setup` | Create the databases, migrate them and set the `gtm_app` password |
+| `npm run db:migrate` | Apply any migration that has not run yet |
+| `npm run db:reset` | Drop, recreate, migrate and seed the local database |
 | `npm run db:seed` | Load invented sample data (local only) |
+| `npm run db:verify` | Run the 15 SQL checks in `db/verify` against a throwaway database |
 | `npm run user:create -- --email someone@yallo.co --name "Name" --role contributor` | Invite a person; prints and emails their set-password link |
-| `npm run verify` | Run every check: lint, types, unit, server, database, browser tests |
-| `npm run jobs:run-now` | Run the reminder job once, now |
+| `npm run test` | Vitest: shared, server, database and jobs |
+| `npm run e2e` | Playwright: the browser journeys, at 1440 px and 390 px |
+| `npm run verify` | Everything: lint, types, unit, server, database, browser |
+| `npm run jobs:run-now` | Run the reminder job once, now. Add `--report` for the Monday report |
+| `npm run build` | Build the server and the web app for production |
+
+### If PostgreSQL is not on your PATH
+
+This machine has it under Homebrew. Add it once:
+
+```bash
+echo 'export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"' >> ~/.zshrc
+```
+
+### Starting from nothing on another machine
+
+```bash
+brew install postgresql@16 mailpit     # or install Docker and use docker-compose.yml
+brew services start postgresql@16
+brew services start mailpit
+cp .env.example .env                   # then set GTM_APP_PASSWORD and SESSION_SECRET
+npm install
+npm run db:setup
+npm run db:seed
+npm run dev
+```
