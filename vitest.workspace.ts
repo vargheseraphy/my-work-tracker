@@ -26,9 +26,14 @@ export default defineWorkspace([
       globalSetup: ['./src/test/global-setup.ts'],
       hookTimeout: 60_000,
       testTimeout: 30_000,
-      // The database is shared state: one file at a time keeps the rules tests honest.
+      // One database, shared by every file: run one file at a time in one process, or a
+      // truncate in one file wipes the people another file is in the middle of using.
       fileParallelism: false,
       pool: 'forks',
+      poolOptions: { forks: { singleFork: true, minForks: 1, maxForks: 1 } },
+      maxWorkers: 1,
+      minWorkers: 1,
+      sequence: { concurrent: false },
     },
   },
   {
