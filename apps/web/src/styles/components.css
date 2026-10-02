@@ -773,3 +773,71 @@
     transition: none;
   }
 }
+
+/* ---------- sign in (design/signin.html) ---------- */
+.signin {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+}
+.signin .hero {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.signin .hero h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  max-width: 520px;
+}
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.lockup .t {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+}
+.lockup .t b {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.lockup .t small {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.signin .panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+.signin .box {
+  width: 420px;
+  max-width: 100%;
+}
+@media (max-width: 900px) {
+  .signin {
+    grid-template-columns: 1fr;
+  }
+  .signin .hero {
+    padding: 32px 16px;
+    gap: 40px;
+  }
+  .signin .hero h1 {
+    font-size: 32px;
+  }
+}
