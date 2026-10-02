@@ -22,7 +22,11 @@ Invented test logins created by the seed. Local only. Not real people.
 
 | Role | Email | Password |
 | --- | --- | --- |
-| | | |
+| Raphy | raphy@example.test | quartz-pebble-07a3 |
+| Tanzil | tanzil@example.test | quartz-quartz-4f07 |
+| Anil | anil@example.test | pebble-amber-cf4b |
+| Tamre | tamre@example.test | willow-meadow-150d |
+| Leadership | viewer@example.test | harbour-willow-a47b |
 
 ## Open items
 None yet.
