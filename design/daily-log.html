@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily log · Yallo GTM</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#F5F5F3; --surface:#FFFFFF; --surface-2:#FAFAF8; --border:#E4E4E0; --border-strong:#CFCFC9;
+  --text:#111111; --muted:#555555; --faint:#6E6E6E;
+  --gold:#D4A843; --gold-light:#F0C866; --gold-tint:#FBF5E6;
+  --good:#2B6E45; --good-bg:#E7F2EB; --good-line:#B9DBC6;
+  --bad:#A83A28; --bad-bg:#FBECE8; --bad-line:#EDC2B8;
+  --warn:#7A5200; --warn-bg:#FFF3D6; --warn-line:#EBD49A;
+  --info:#34465A; --info-bg:#E9EEF3; --info-line:#C4D0DC;
+  --radius:12px;
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 45%,transparent 100%);z-index:50}
+a{color:var(--text)}
+h1,h2,h3{margin:0;color:var(--text)}
+h1{font-size:30px;font-weight:800;line-height:1.2}
+h2{font-size:17px;font-weight:700}
+h3{font-size:15px;font-weight:700}
+p{margin:0}
+button,input,select,textarea{font-family:inherit;font-size:14px;color:var(--text)}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+
+/* shell */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:28px 16px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px;text-decoration:none}
+.brand b{font-size:16px;font-weight:800;letter-spacing:.04em}
+.brand small{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--faint)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav .label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);padding:14px 12px 6px}
+.nav a{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;padding:0 12px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:14px;font-weight:500;position:relative}
+.nav a:hover{background:var(--surface-2);color:var(--text)}
+.nav a[aria-current="page"]{background:var(--bg);color:var(--text);font-weight:700}
+.nav a[aria-current="page"]::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--gold)}
+.me{margin-top:auto;display:flex;align-items:center;gap:12px;padding:14px 8px 0;border-top:1px solid var(--border)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.me .who{display:flex;flex-direction:column;line-height:1.3}
+.me .who b{font-size:14px}.me .who span{font-size:12px;color:var(--faint)}
+.role-switch{font-size:12px;color:var(--muted);padding:0 8px}
+.role-switch a{color:var(--text);font-weight:600}
+
+.main{padding:40px 48px 64px;display:flex;flex-direction:column;gap:24px;max-width:1240px;width:100%}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.page-head .titles{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:14px;height:2px;background:var(--gold);border-radius:1px}
+.sample{font-family:var(--mono);font-size:11px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;color:var(--faint);background:var(--surface)}
+
+/* surfaces */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.card.tight{padding:16px 20px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.card-head .sub{font-size:12px;color:var(--faint)}
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.stat{font-size:24px;font-weight:800}
+.muted{color:var(--muted)}.faint{color:var(--faint)}.small{font-size:13px}.xs{font-size:12px}
+.mono{font-family:var(--mono)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.row{display:flex;align-items:center;gap:12px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.between{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.divider{height:1px;background:var(--border);border:0;margin:0}
+.hidden{display:none!important}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font-weight:600;font-size:14px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--text);border-color:var(--text);color:#fff}
+.btn-primary:hover{background:#2A2A2A}
+.btn-primary:disabled,.btn:disabled{background:#ECECE8;border-color:#ECECE8;color:#8A8A8A;cursor:not-allowed}
+.btn-ghost{border-color:transparent;background:transparent}
+.btn-sm{min-height:34px;padding:0 12px;font-size:13px}
+.btn-block{width:100%}
+.btn-dashed{border-style:dashed;border-color:var(--bad);color:var(--bad);background:var(--surface)}
+.btn-ok{border-color:var(--good-line);background:var(--good-bg);color:var(--good)}
+
+/* forms */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.lbl{font-size:14px;font-weight:600}
+.hint{font-size:12px;color:var(--faint)}
+.input,.select,.textarea{width:100%;min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface)}
+.textarea{padding:10px 12px;line-height:1.6;resize:vertical;min-height:88px}
+.input.num{width:100px;text-align:right;font-family:var(--mono);font-size:16px}
+.input.ok,.select.ok{border-color:var(--good-line);background:#FBFEFC}
+.input.err,.select.err{border-color:var(--bad)}
+.err-text{font-size:12px;color:var(--bad)}
+.input:disabled{background:var(--surface-2);color:var(--muted)}
+
+/* form rows */
+.frow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.frow:first-of-type{border-top:0}
+.frow .flabel{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.frow .flabel b{font-size:14px;font-weight:600}
+.frow .proof{width:220px;display:flex;justify-content:flex-end}
+.fwrap{display:flex;flex-direction:column}
+.fwrap + .fwrap{border-top:1px solid var(--border)}
+.fwrap .frow{border-top:0}
+.fwrap .err-text{margin:-6px 0 10px}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.pill.good{background:var(--good-bg);border-color:var(--good-line);color:var(--good)}
+.pill.bad{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.pill.warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.pill.info{background:var(--info-bg);border-color:var(--info-line);color:var(--info)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot.g{background:#3F9A63}.dot.a{background:#D99A1E}.dot.r{background:#C8513C}.dot.w{background:#fff;border:1px solid var(--border-strong)}
+
+/* banners */
+.banner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;border-radius:var(--radius);border:1px solid}
+.banner.bad{background:var(--bad-bg);border-color:var(--bad-line)}
+.banner.good{background:var(--good-bg);border-color:var(--good-line)}
+.banner.warn{background:var(--warn-bg);border-color:var(--warn-line)}
+.banner.info{background:var(--info-bg);border-color:var(--info-line)}
+.banner .msg{display:flex;align-items:center;gap:12px}
+.banner .msg b{display:block;font-size:15px}
+.banner .msg span{font-size:13px;color:var(--muted)}
+
+/* progress */
+.bar{height:6px;border-radius:3px;background:#ECECE8;overflow:hidden}
+.bar > i{display:block;height:100%;border-radius:3px;background:var(--text)}
+.bar > i.gold{background:var(--gold)}
+.bar > i.behind{background:#9AA8B7}
+.bar > i.good{background:#3F9A63}
+
+/* tables */
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.table tr:last-child td{border-bottom:0}
+.table td.num,.table th.num{text-align:right;font-family:var(--mono)}
+.table tbody tr:hover{background:var(--surface-2)}
+
+/* tabs / segmented */
+.seg{display:inline-flex;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.seg button{min-height:34px;padding:0 12px;border:0;border-radius:7px;background:transparent;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:0 0 0 1px var(--border)}
+
+/* day tabs */
+.daytabs{display:flex;gap:8px}
+.daytab{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:150px;min-height:56px;padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;cursor:pointer;text-align:left}
+.daytab[aria-selected="true"]{background:var(--surface);border-color:var(--text)}
+.daytab b{font-size:14px}
+.daytab span{font-family:var(--mono);font-size:11px}
+
+/* toggles */
+.switch{position:relative;width:40px;height:24px;flex-shrink:0}
+.switch input{opacity:0;width:100%;height:100%;margin:0;position:absolute;cursor:pointer;z-index:1}
+.switch i{position:absolute;inset:0;border-radius:12px;background:#D6D6D0;transition:background .15s}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked + i{background:var(--text)}
+.switch input:checked + i::after{transform:translateX(16px)}
+
+/* modal / drawer */
+.overlay{position:fixed;inset:0;background:rgba(17,17,17,.35);display:flex;justify-content:flex-end;z-index:60}
+.overlay.center{justify-content:center;align-items:center}
+.drawer{width:440px;max-width:100%;height:100%;background:var(--surface);border-left:1px solid var(--border);padding:28px;display:flex;flex-direction:column;gap:18px;overflow:auto}
+.modal{width:520px;max-width:calc(100% - 32px);background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:28px;display:flex;flex-direction:column;gap:18px;max-height:90vh;overflow:auto}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;z-index:70;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+
+/* kanban */
+.board{display:grid;grid-template-columns:repeat(6,minmax(170px,1fr));gap:12px;overflow-x:auto;padding-bottom:4px}
+.col{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:10px;min-height:280px}
+.col-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;padding:2px 4px}
+.acc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left}
+.acc:hover{border-color:var(--border-strong)}
+.acc b{font-size:14px}
+
+/* compliance grid */
+.cgrid{display:grid;gap:3px;align-items:center}
+.cgrid .c{height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px}
+.c.sub{background:#CFE6D7;color:var(--good)}
+.c.late{background:#F6E2A8;color:var(--warn)}
+.c.miss{background:#F2C3B8;color:var(--bad)}
+.c.off{background:#EFEFEB;color:#9A9A94}
+.c.hol{background:var(--info-bg);color:var(--info)}
+.c.fut{background:transparent;border:1px dashed var(--border)}
+.c.hd{background:transparent;color:var(--faint)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .dow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:4px 6px}
+.cal .day{min-height:96px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left}
+.cal .day.we{background:var(--surface-2)}
+.cal .day.out{visibility:hidden}
+.cal .day.sel{border-color:var(--text)}
+.cal .day .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* index */
+.screen-list a{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);text-decoration:none}
+.screen-list a:hover{border-color:var(--text)}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:14px 16px;gap:12px}
+  .nav{flex-direction:row;flex-wrap:wrap}.nav .label{display:none}
+  .me{margin:0;border:0;padding:0}
+  .main{padding:24px 16px 48px}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .frow{flex-wrap:wrap}.frow .proof{width:100%;justify-content:flex-start}
+  .split{flex-direction:column}
+  .split > aside{width:100%!important;position:static!important}
+}
+@media print{
+  .sidebar,.no-print,body::before{display:none!important}
+  .app{display:block}.main{padding:0;max-width:none}
+  body{background:#fff}.card{break-inside:avoid}
+}
+
+</style>
+<script>
+/* Yallo GTM Tracker prototype: shared shell, sample data and helpers.
+   All data here is SAMPLE data for the prototype. Nothing is saved; refreshing a page resets it. */
+(function () {
+  const LOGO = '<svg width="22" height="22" viewBox="0 0 300 300" aria-hidden="true">' +
+    ['M19.6,214.3c0-32.4,26.1-58.7,58.3-58.7h58.3v58.7c0,32.4-26.1,58.7-58.3,58.7s-58.3-26.3-58.3-58.7Z',
+     'M272.5,78.9c0,32.4-26.1,58.7-58.3,58.7h-58.3v-58.7c0-32.4,26.1-58.7,58.3-58.7s58.3,26.3,58.3,58.7Z',
+     'M19.6,78.9c0,32.4,26.1,58.7,58.3,58.7h58.3v-58.7c0-32.4-26.1-58.7-58.3-58.7s-58.3,26.3-58.3,58.7Z',
+     'M272.5,214.3c0-32.4-26.1-58.7-58.3-58.7h-58.3v58.7c0,32.4,26.1,58.7,58.3,58.7s58.3-26.3,58.3-58.7Z']
+      .map(d => '<path fill-rule="evenodd" fill="#D4A843" d="' + d + '"/>').join('') + '</svg>';
+
+  const NAV = {
+    contributor: [
+      { label: 'My work' },
+      { href: 'home.html', text: 'Home', key: 'home' },
+      { href: 'daily-log.html', text: 'Daily log', key: 'daily', badge: '1 missing' },
+      { href: 'weekly-log.html', text: 'Weekly log', key: 'weekly' },
+      { href: 'my-tasks.html', text: 'My tasks', key: 'tasks', badge: '1 overdue' },
+      { href: 'abm-tracker.html', text: 'ABM tracker', key: 'abm' }
+    ],
+    manager: [
+      { label: 'Team' },
+      { href: 'dashboard.html', text: 'Dashboard', key: 'dashboard' },
+      { href: 'weekly-report.html', text: 'Weekly report', key: 'report' },
+      { href: 'person.html', text: 'People', key: 'person' },
+      { href: 'task-management.html', text: 'Task management', key: 'taskmgmt' },
+      { href: 'abm-tracker.html?as=manager', text: 'ABM tracker', key: 'abm' },
+      { label: 'Setup' },
+      { href: 'calendar.html', text: 'Holidays and leave', key: 'calendar' },
+      { href: 'settings.html', text: 'Targets and fields', key: 'settings' }
+    ]
+  };
+
+  const TEAM = [
+    { id: 'tanzil', name: 'Tanzil', initials: 'TZ' },
+    { id: 'anil', name: 'Anil', initials: 'AN' },
+    { id: 'tamre', name: 'Tamre', initials: 'TM' }
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function roleFromPage() {
+    const q = new URLSearchParams(location.search).get('as');
+    if (q === 'manager' || q === 'contributor') return q;
+    return document.body.dataset.role || 'contributor';
+  }
+
+  function renderShell() {
+    const side = document.getElementById('sidebar');
+    if (!side) return;
+    const role = roleFromPage();
+    const active = document.body.dataset.page;
+    const items = NAV[role].map(it => {
+      if (it.label) return '<div class="label">' + esc(it.label) + '</div>';
+      const cur = it.key === active ? ' aria-current="page"' : '';
+      const badge = it.badge && role === 'contributor' ? '<span class="pill bad">' + esc(it.badge) + '</span>' : '';
+      return '<a href="' + it.href + '"' + cur + '><span>' + esc(it.text) + '</span>' + badge + '</a>';
+    }).join('');
+    const me = role === 'manager'
+      ? { i: 'RA', n: 'Raphy', r: 'Admin · GTM lead' }
+      : { i: 'TZ', n: 'Tanzil', r: 'Contributor' };
+    const switchTo = role === 'manager'
+      ? '<a href="home.html">Switch to contributor view</a>'
+      : '<a href="dashboard.html">Switch to manager view</a>';
+    side.innerHTML =
+      '<a class="brand" href="index.html" aria-label="All screens">' + LOGO + '<b>YALLO</b><small>GTM</small></a>' +
+      '<nav class="nav" aria-label="Main">' + items + '</nav>' +
+      '<div class="me"><div class="avatar">' + me.i + '</div><div class="who"><b>' + me.n + '</b><span>' + me.r + '</span></div></div>' +
+      '<div class="role-switch">Prototype: ' + switchTo + '</div>';
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    let t = document.querySelector('.toast');
+    if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('hidden'), 3200);
+  }
+
+  function pillClass(status) {
+    return ({ 'Done': 'good', 'Submitted': 'good', 'In progress': 'info', 'Blocked': 'bad', 'Overdue': 'bad', 'Late': 'warn', 'Not started': '' })[status] || '';
+  }
+
+  // Sample backlog tasks (dates in 2026). today = Tue 29 Sep.
+  const TASKS = [
+    { id: 1, title: 'Draft 3 LinkedIn posts on AI delivery', desc: 'Three posts for the saasinator AI page, one per week in October. Use the delivery case themes Raphy shared.', owner: 'tanzil', due: '2026-09-25', priority: 'High', status: 'Blocked', note: 'Waiting for approved case theme list.' },
+    { id: 2, title: 'Clean the filtered contacts list for UAE banking', desc: 'Remove duplicates and anyone who left the account in the last 6 months.', owner: 'tanzil', due: '2026-09-29', priority: 'Medium', status: 'Not started' },
+    { id: 3, title: 'Build the October newsletter in Accumba', desc: 'Newsletter for the Yallo Talent list. Two stories and one open role.', owner: 'tanzil', due: '2026-09-30', priority: 'High', status: 'In progress' },
+    { id: 4, title: 'Update the SAP talent one-pager', desc: 'Refresh proof points from the approved list only.', owner: 'tanzil', due: '2026-10-06', priority: 'Low', status: 'Not started' },
+    { id: 5, title: 'Research pack for next ABM account', desc: 'Org chart, 5 personas, recent news and hiring signals.', owner: 'anil', due: '2026-10-01', priority: 'High', status: 'In progress' },
+    { id: 6, title: 'Fix broken form on the contact page', desc: 'Form submits but no email arrives. Check with the web team.', owner: 'anil', due: '2026-09-26', priority: 'High', status: 'Not started' },
+    { id: 7, title: 'Poster set for the AI Academy webinar', desc: 'Three sizes: LinkedIn post, story, email header.', owner: 'tamre', due: '2026-10-02', priority: 'Medium', status: 'In progress' },
+    { id: 8, title: 'GEO audit of the top 10 pages', desc: 'Check how the pages answer common buyer questions in AI search tools.', owner: 'tamre', due: '2026-09-24', priority: 'Medium', status: 'Done', proof: 'geo-audit.pdf' }
+  ];
+  const TODAY = '2026-09-29';
+  function fmtDate(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
+    const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()];
+    return wd + ' ' + d.getDate() + ' ' + mo;
+  }
+  function dueInfo(t) {
+    if (t.status === 'Done') return { text: 'Done', cls: 'good' };
+    if (t.due < TODAY) return { text: 'Overdue · ' + fmtDate(t.due), cls: 'bad' };
+    if (t.due === TODAY) return { text: 'Due today', cls: 'warn' };
+    return { text: 'Due ' + fmtDate(t.due), cls: '' };
+  }
+  function person(id) { return TEAM.find(p => p.id === id) || { name: id, initials: '?' }; }
+
+  window.GTM = { LOGO, TEAM, TASKS, TODAY, esc, toast, pillClass, renderShell, role: roleFromPage, fmtDate, dueInfo, person };
+  document.addEventListener('DOMContentLoaded', renderShell);
+})();
+
+</script>
+</head>
+<body data-page="daily" data-role="contributor">
+<div class="app">
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main">
+  <div class="page-head">
+    <div class="titles">
+      <span class="eyebrow">Daily log</span>
+      <h1 id="dayTitle">Monday 28 September</h1>
+    </div>
+    <div class="daytabs" role="tablist" aria-label="Day" id="daytabs"></div>
+  </div>
+
+  <div id="backfill" class="banner bad"><div class="msg"><div><b>You are filling in a missed day</b><span>It will show as Late on the team dashboard. Today unlocks once this is submitted.</span></div></div></div>
+  <div id="doneMsg" class="banner good hidden" role="status"><div class="msg"><div><b id="doneTitle"></b><span id="doneText"></span></div></div></div>
+
+  <section id="allDone" class="card stack hidden" style="padding:40px;gap:16px;align-items:flex-start">
+    <span class="kicker" style="color:var(--good)">Submitted and locked</span>
+    <h2 style="font-size:26px">You are up to date for this week.</h2>
+    <p class="muted" style="max-width:520px">Monday went in late and Tuesday on time. Raphy sees both on the dashboard. Need to correct something? Ask Raphy to unlock the entry.</p>
+    <a class="btn btn-primary" href="home.html">Back to home</a>
+  </section>
+
+  <div id="formWrap" class="row split" style="align-items:flex-start;gap:24px">
+    <form id="form" class="stack" style="flex:1;min-width:0;gap:16px" novalidate></form>
+    <aside class="card stack" aria-label="Submission status" style="width:310px;position:sticky;top:24px;gap:16px">
+      <div class="stack" style="gap:6px">
+        <span class="kicker">Ready to sign off</span>
+        <span class="stat" id="count">0 of 15</span>
+        <div class="bar"><i class="gold" id="progress" style="width:0%"></i></div>
+      </div>
+      <div id="outstanding" class="stack" style="gap:6px"></div>
+      <button class="btn btn-primary btn-block" id="submit" type="button" disabled style="min-height:52px">Complete all fields to submit</button>
+      <p class="xs faint">Submitting locks the entry. Only Raphy can unlock it, and every change is recorded.</p>
+      <hr class="divider">
+      <button class="btn btn-sm btn-block" id="demo" type="button">Prototype only: fill sample values</button>
+    </aside>
+  </div>
+</main>
+</div>
+<script>
+const FIELDS = [
+  { g: 'LinkedIn', k: 'posts', l: 'Posts published', proof: 'link', pt: 'link to each post' },
+  { g: 'LinkedIn', k: 'comments', l: 'Comments made', proof: 'file', pt: 'screenshot of activity' },
+  { g: 'LinkedIn', k: 'likes', l: 'Likes given' },
+  { g: 'LinkedIn', k: 'dms', l: 'Direct messages sent', proof: 'file', pt: 'screenshot of sent messages' },
+  { g: 'Email', k: 'emails', l: 'Emails sent', proof: 'file', pt: 'screenshot from the email tool' },
+  { g: 'Email', k: 'templates', l: 'Accumba mail templates created', proof: 'link', pt: 'link to the template' },
+  { g: 'Email', k: 'replies', l: 'Replies received' },
+  { g: 'Accounts', k: 'found', l: 'New accounts found' },
+  { g: 'Accounts', k: 'added', l: 'New accounts added to CRM' },
+  { g: 'Accounts', k: 'contacts', l: 'Contacts added' },
+  { g: 'Accounts', k: 'filtered', l: 'Contacts filtered (qualified)', hint: 'Cannot be more than contacts added' },
+  { g: 'Content', k: 'posters', l: 'Posters created', proof: 'file', pt: 'upload the poster' },
+  { g: 'Content', k: 'newsletters', l: 'Newsletter campaigns launched', proof: 'link', pt: 'link to the campaign' }
+];
+const TASKS = [
+  { k: 't1', title: 'Draft 3 LinkedIn posts on AI delivery', due: 'Overdue · was due Fri 25 Sep', overdue: true },
+  { k: 't2', title: 'Clean the filtered contacts list for UAE banking', due: 'Due today' }
+];
+let S = { day: 'mon', monDone: false, tueDone: false };
+let vals, proofs, tstat, slotMode;
+function reset() { vals = {}; proofs = {}; tstat = {}; slotMode = {}; }
+
+function buildForm() {
+  reset();
+  const groups = [...new Set(FIELDS.map(f => f.g))];
+  let html = groups.map(g => `
+    <section class="card" style="padding:8px 20px 8px">
+      <div class="between" style="min-height:48px"><h2>${g}</h2><span class="mono xs faint" id="gc-${g}"></span></div>
+      ${FIELDS.filter(f => f.g === g).map(f => `
+        <div class="fwrap" id="w-${f.k}">
+          <div class="frow">
+            <label class="flabel" for="f-${f.k}"><b>${f.l}</b><span class="hint">${f.hint || (f.proof ? 'Proof needed if more than 0' : 'No proof needed')}</span></label>
+            <input class="input num" id="f-${f.k}" data-k="${f.k}" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+            <div class="proof" id="p-${f.k}"></div>
+          </div>
+          <span class="err-text hidden" id="e-${f.k}"></span>
+        </div>`).join('')}
+    </section>`).join('');
+  html += `
+    <section class="card" style="padding:8px 20px 8px">
+      <div class="between" style="min-height:48px"><h2>Backlog tasks due</h2><span class="mono xs faint" id="gc-tasks"></span></div>
+      ${TASKS.map(t => `
+        <div class="frow">
+          <label class="flabel" for="t-${t.k}"><b>${t.title}</b><span class="hint" style="${t.overdue ? 'color:var(--bad)' : ''}">${t.due}</span></label>
+          <select class="select" id="t-${t.k}" data-t="${t.k}" style="width:220px">
+            <option value="">Update status</option><option>Not started</option><option>In progress</option><option>Blocked</option><option>Done</option>
+          </select>
+        </div>`).join('')}
+    </section>
+    <section class="card field">
+      <div class="between"><label for="notes">Blockers or comments</label><span class="hint">Optional</span></div>
+      <textarea class="textarea" id="notes" rows="3" placeholder="Anything Raphy should know about today"></textarea>
+    </section>`;
+  document.getElementById('form').innerHTML = html;
+  refresh();
+}
+
+function check(f) {
+  const raw = vals[f.k];
+  const blank = raw === undefined || raw === '';
+  const n = Number(raw);
+  let error = '', ok = !blank;
+  if (!blank && (!(n >= 0) || !Number.isInteger(n))) { error = 'Enter a whole number, 0 or more.'; ok = false; }
+  if (!blank && f.k === 'filtered' && vals.contacts !== undefined && vals.contacts !== '' && n > Number(vals.contacts)) {
+    error = `Filtered contacts cannot be more than contacts added (${vals.contacts}).`; ok = false;
+  }
+  const needs = !blank && !error && n > 0 && !!f.proof;
+  const has = f.proof === 'link' ? !!(proofs[f.k] && String(proofs[f.k]).trim()) : !!proofs[f.k];
+  if (needs && !has) ok = false;
+  return { blank, error, ok, needs, has };
+}
+
+function refresh() {
+  const out = [];
+  let done = 0;
+  const gcount = {};
+  FIELDS.forEach(f => {
+    const c = check(f);
+    gcount[f.g] = gcount[f.g] || [0, 0]; gcount[f.g][1]++;
+    if (c.ok) { done++; gcount[f.g][0]++; }
+    else out.push(c.blank ? `${f.l}: enter a number (0 is fine)` : c.error ? `${f.l}: fix the value` : `${f.l}: ${f.pt}`);
+    const inp = document.getElementById('f-' + f.k);
+    inp.classList.toggle('ok', c.ok); inp.classList.toggle('err', !!c.error);
+    const e = document.getElementById('e-' + f.k); e.textContent = c.error; e.classList.toggle('hidden', !c.error);
+    const mode = !c.needs ? 'none' : f.proof === 'link' ? 'link' : (c.has ? 'fileok' : 'file');
+    if (slotMode[f.k] !== mode) {
+      slotMode[f.k] = mode;
+      const slot = document.getElementById('p-' + f.k);
+      if (mode === 'none') slot.innerHTML = '';
+      if (mode === 'file') slot.innerHTML = `<button type="button" class="btn btn-dashed" data-file="${f.k}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>Attach screenshot</button>`;
+      if (mode === 'fileok') slot.innerHTML = `<button type="button" class="btn btn-ok" data-file="${f.k}" aria-label="Remove screenshot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>${f.k}-screenshot.png</button>`;
+      if (mode === 'link') slot.innerHTML = `<input class="input" type="url" data-link="${f.k}" aria-label="${f.pt}" placeholder="Paste link" value="${GTM.esc(proofs[f.k] || '')}" style="width:220px">`;
+    }
+    const li = document.querySelector(`[data-link="${f.k}"]`);
+    if (li) { li.classList.toggle('ok', c.has); li.classList.toggle('err', !c.has); }
+  });
+  Object.entries(gcount).forEach(([g, [a, b]]) => { const el = document.getElementById('gc-' + g); el.textContent = `${a} / ${b}`; el.style.color = a === b ? 'var(--good)' : ''; });
+  let td = 0;
+  TASKS.forEach(t => {
+    const sel = document.getElementById('t-' + t.k);
+    const v = tstat[t.k] || '';
+    sel.classList.toggle('ok', !!v);
+    if (v) td++; else out.push(`Task status: ${t.title}`);
+  });
+  const gt = document.getElementById('gc-tasks'); gt.textContent = `${td} / ${TASKS.length}`; gt.style.color = td === TASKS.length ? 'var(--good)' : '';
+  done += td;
+  const total = FIELDS.length + TASKS.length;
+  const ready = done === total;
+  document.getElementById('count').textContent = `${done} of ${total}`;
+  const p = document.getElementById('progress'); p.style.width = Math.round(done / total * 100) + '%'; p.className = ready ? 'good' : 'gold';
+  document.getElementById('outstanding').innerHTML = ready
+    ? '<p class="small" style="color:var(--good)">Everything is filled and proof is attached.</p>'
+    : '<b class="small">Still needed</b>' + out.slice(0, 5).map(o => `<span class="small muted">· ${GTM.esc(o)}</span>`).join('') + (out.length > 5 ? `<span class="xs faint">and ${out.length - 5} more</span>` : '');
+  const btn = document.getElementById('submit');
+  btn.disabled = !ready;
+  btn.textContent = ready ? (S.day === 'mon' ? 'Submit Monday (late)' : 'Submit today') : 'Complete all fields to submit';
+}
+
+function drawChrome() {
+  const all = S.monDone && S.tueDone;
+  const tabs = [
+    { k: 'mon', l: 'Mon 28 Sep', tag: S.monDone ? 'Submitted · Late' : 'Missing', c: S.monDone ? 'var(--good)' : 'var(--bad)', can: true },
+    { k: 'tue', l: 'Tue 29 Sep', tag: S.tueDone ? 'Submitted' : S.monDone ? 'Today · due 7pm' : 'Locked', c: S.tueDone ? 'var(--good)' : 'var(--faint)', can: S.monDone }
+  ];
+  document.getElementById('daytabs').innerHTML = tabs.map(t => `<button class="daytab" role="tab" aria-selected="${S.day === t.k}" data-day="${t.k}" ${t.can && !all ? '' : 'aria-disabled="true"'}><b>${t.l}</b><span style="color:${t.c}">${t.tag}</span></button>`).join('');
+  document.getElementById('dayTitle').textContent = all ? 'All caught up' : S.day === 'mon' ? 'Monday 28 September' : 'Tuesday 29 September';
+  document.getElementById('backfill').classList.toggle('hidden', !(S.day === 'mon' && !S.monDone));
+  document.getElementById('allDone').classList.toggle('hidden', !all);
+  document.getElementById('formWrap').classList.toggle('hidden', all);
+}
+
+document.getElementById('daytabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-day]'); if (!b || b.getAttribute('aria-disabled')) return;
+  if (b.dataset.day === 'tue' && S.tueDone) return;
+  if (b.dataset.day === 'mon' && S.monDone) { GTM.toast('Monday is submitted and locked. Ask Raphy to unlock it.'); return; }
+  S.day = b.dataset.day; drawChrome(); buildForm();
+});
+const form = document.getElementById('form');
+form.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.k) vals[t.dataset.k] = t.value;
+  if (t.dataset.link) proofs[t.dataset.link] = t.value;
+  if (t.dataset.t) tstat[t.dataset.t] = t.value;
+  refresh();
+});
+form.addEventListener('change', e => { if (e.target.dataset.t) { tstat[e.target.dataset.t] = e.target.value; refresh(); } });
+form.addEventListener('click', e => { const b = e.target.closest('[data-file]'); if (b) { proofs[b.dataset.file] = !proofs[b.dataset.file]; refresh(); } });
+
+document.getElementById('submit').addEventListener('click', () => {
+  const dm = document.getElementById('doneMsg');
+  if (S.day === 'mon') {
+    S.monDone = true; S.day = 'tue';
+    document.getElementById('doneTitle').textContent = 'Monday 28 September submitted and marked late';
+    document.getElementById('doneText').textContent = 'Today is now open. It is due by 7pm.';
+    dm.classList.remove('hidden');
+  } else { S.tueDone = true; dm.classList.add('hidden'); }
+  drawChrome(); if (!(S.monDone && S.tueDone)) buildForm();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.getElementById('demo').addEventListener('click', () => {
+  const sample = { posts: 1, comments: 24, likes: 40, dms: 8, emails: 20, templates: 0, replies: 2, found: 3, added: 2, contacts: 45, filtered: 30, posters: 1, newsletters: 0 };
+  Object.entries(sample).forEach(([k, v]) => { vals[k] = String(v); document.getElementById('f-' + k).value = v; });
+  Object.assign(proofs, { posts: 'https://www.linkedin.com/posts/example', comments: true, dms: true, emails: true, posters: true });
+  slotMode = {};
+  tstat = { t1: 'In progress', t2: 'Done' };
+  document.getElementById('t-t1').value = 'In progress'; document.getElementById('t-t2').value = 'Done';
+  refresh();
+});
+
+drawChrome(); buildForm();
+</script>
+</body>
+</html>

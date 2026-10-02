@@ -1,0 +1,40 @@
+{
+  "attribution": {
+    "commit": false,
+    "pr": false
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git status *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git restore *)",
+      "Bash(git stash *)",
+      "Bash(docker compose *)",
+      "Bash(docker ps *)",
+      "Bash(psql *)",
+      "Bash(pg_isready *)",
+      "Bash(createdb *)",
+      "Bash(curl http://localhost*)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)"
+    ],
+    "deny": [
+      "Bash(git push *)",
+      "Bash(git remote *)",
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "Bash(docker volume rm *)",
+      "Bash(docker system prune *)"
+    ]
+  }
+}

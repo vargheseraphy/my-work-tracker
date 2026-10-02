@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Home · Yallo GTM</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#F5F5F3; --surface:#FFFFFF; --surface-2:#FAFAF8; --border:#E4E4E0; --border-strong:#CFCFC9;
+  --text:#111111; --muted:#555555; --faint:#6E6E6E;
+  --gold:#D4A843; --gold-light:#F0C866; --gold-tint:#FBF5E6;
+  --good:#2B6E45; --good-bg:#E7F2EB; --good-line:#B9DBC6;
+  --bad:#A83A28; --bad-bg:#FBECE8; --bad-line:#EDC2B8;
+  --warn:#7A5200; --warn-bg:#FFF3D6; --warn-line:#EBD49A;
+  --info:#34465A; --info-bg:#E9EEF3; --info-line:#C4D0DC;
+  --radius:12px;
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+  --mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 45%,transparent 100%);z-index:50}
+a{color:var(--text)}
+h1,h2,h3{margin:0;color:var(--text)}
+h1{font-size:30px;font-weight:800;line-height:1.2}
+h2{font-size:17px;font-weight:700}
+h3{font-size:15px;font-weight:700}
+p{margin:0}
+button,input,select,textarea{font-family:inherit;font-size:14px;color:var(--text)}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+
+/* shell */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:28px 16px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px;text-decoration:none}
+.brand b{font-size:16px;font-weight:800;letter-spacing:.04em}
+.brand small{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--faint)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav .label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);padding:14px 12px 6px}
+.nav a{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;padding:0 12px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:14px;font-weight:500;position:relative}
+.nav a:hover{background:var(--surface-2);color:var(--text)}
+.nav a[aria-current="page"]{background:var(--bg);color:var(--text);font-weight:700}
+.nav a[aria-current="page"]::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--gold)}
+.me{margin-top:auto;display:flex;align-items:center;gap:12px;padding:14px 8px 0;border-top:1px solid var(--border)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.me .who{display:flex;flex-direction:column;line-height:1.3}
+.me .who b{font-size:14px}.me .who span{font-size:12px;color:var(--faint)}
+.role-switch{font-size:12px;color:var(--muted);padding:0 8px}
+.role-switch a{color:var(--text);font-weight:600}
+
+.main{padding:40px 48px 64px;display:flex;flex-direction:column;gap:24px;max-width:1240px;width:100%}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.page-head .titles{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:14px;height:2px;background:var(--gold);border-radius:1px}
+.sample{font-family:var(--mono);font-size:11px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;color:var(--faint);background:var(--surface)}
+
+/* surfaces */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.card.tight{padding:16px 20px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.card-head .sub{font-size:12px;color:var(--faint)}
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.stat{font-size:24px;font-weight:800}
+.muted{color:var(--muted)}.faint{color:var(--faint)}.small{font-size:13px}.xs{font-size:12px}
+.mono{font-family:var(--mono)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.row{display:flex;align-items:center;gap:12px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.between{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.divider{height:1px;background:var(--border);border:0;margin:0}
+.hidden{display:none!important}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font-weight:600;font-size:14px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--text);border-color:var(--text);color:#fff}
+.btn-primary:hover{background:#2A2A2A}
+.btn-primary:disabled,.btn:disabled{background:#ECECE8;border-color:#ECECE8;color:#8A8A8A;cursor:not-allowed}
+.btn-ghost{border-color:transparent;background:transparent}
+.btn-sm{min-height:34px;padding:0 12px;font-size:13px}
+.btn-block{width:100%}
+.btn-dashed{border-style:dashed;border-color:var(--bad);color:var(--bad);background:var(--surface)}
+.btn-ok{border-color:var(--good-line);background:var(--good-bg);color:var(--good)}
+
+/* forms */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.lbl{font-size:14px;font-weight:600}
+.hint{font-size:12px;color:var(--faint)}
+.input,.select,.textarea{width:100%;min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface)}
+.textarea{padding:10px 12px;line-height:1.6;resize:vertical;min-height:88px}
+.input.num{width:100px;text-align:right;font-family:var(--mono);font-size:16px}
+.input.ok,.select.ok{border-color:var(--good-line);background:#FBFEFC}
+.input.err,.select.err{border-color:var(--bad)}
+.err-text{font-size:12px;color:var(--bad)}
+.input:disabled{background:var(--surface-2);color:var(--muted)}
+
+/* form rows */
+.frow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.frow:first-of-type{border-top:0}
+.frow .flabel{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.frow .flabel b{font-size:14px;font-weight:600}
+.frow .proof{width:220px;display:flex;justify-content:flex-end}
+.fwrap{display:flex;flex-direction:column}
+.fwrap + .fwrap{border-top:1px solid var(--border)}
+.fwrap .frow{border-top:0}
+.fwrap .err-text{margin:-6px 0 10px}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.pill.good{background:var(--good-bg);border-color:var(--good-line);color:var(--good)}
+.pill.bad{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.pill.warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.pill.info{background:var(--info-bg);border-color:var(--info-line);color:var(--info)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot.g{background:#3F9A63}.dot.a{background:#D99A1E}.dot.r{background:#C8513C}.dot.w{background:#fff;border:1px solid var(--border-strong)}
+
+/* banners */
+.banner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;border-radius:var(--radius);border:1px solid}
+.banner.bad{background:var(--bad-bg);border-color:var(--bad-line)}
+.banner.good{background:var(--good-bg);border-color:var(--good-line)}
+.banner.warn{background:var(--warn-bg);border-color:var(--warn-line)}
+.banner.info{background:var(--info-bg);border-color:var(--info-line)}
+.banner .msg{display:flex;align-items:center;gap:12px}
+.banner .msg b{display:block;font-size:15px}
+.banner .msg span{font-size:13px;color:var(--muted)}
+
+/* progress */
+.bar{height:6px;border-radius:3px;background:#ECECE8;overflow:hidden}
+.bar > i{display:block;height:100%;border-radius:3px;background:var(--text)}
+.bar > i.gold{background:var(--gold)}
+.bar > i.behind{background:#9AA8B7}
+.bar > i.good{background:#3F9A63}
+
+/* tables */
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.table td{padding:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.table tr:last-child td{border-bottom:0}
+.table td.num,.table th.num{text-align:right;font-family:var(--mono)}
+.table tbody tr:hover{background:var(--surface-2)}
+
+/* tabs / segmented */
+.seg{display:inline-flex;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.seg button{min-height:34px;padding:0 12px;border:0;border-radius:7px;background:transparent;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--text);box-shadow:0 0 0 1px var(--border)}
+
+/* day tabs */
+.daytabs{display:flex;gap:8px}
+.daytab{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:150px;min-height:56px;padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;cursor:pointer;text-align:left}
+.daytab[aria-selected="true"]{background:var(--surface);border-color:var(--text)}
+.daytab b{font-size:14px}
+.daytab span{font-family:var(--mono);font-size:11px}
+
+/* toggles */
+.switch{position:relative;width:40px;height:24px;flex-shrink:0}
+.switch input{opacity:0;width:100%;height:100%;margin:0;position:absolute;cursor:pointer;z-index:1}
+.switch i{position:absolute;inset:0;border-radius:12px;background:#D6D6D0;transition:background .15s}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked + i{background:var(--text)}
+.switch input:checked + i::after{transform:translateX(16px)}
+
+/* modal / drawer */
+.overlay{position:fixed;inset:0;background:rgba(17,17,17,.35);display:flex;justify-content:flex-end;z-index:60}
+.overlay.center{justify-content:center;align-items:center}
+.drawer{width:440px;max-width:100%;height:100%;background:var(--surface);border-left:1px solid var(--border);padding:28px;display:flex;flex-direction:column;gap:18px;overflow:auto}
+.modal{width:520px;max-width:calc(100% - 32px);background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:28px;display:flex;flex-direction:column;gap:18px;max-height:90vh;overflow:auto}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;z-index:70;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+
+/* kanban */
+.board{display:grid;grid-template-columns:repeat(6,minmax(170px,1fr));gap:12px;overflow-x:auto;padding-bottom:4px}
+.col{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:10px;min-height:280px}
+.col-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;padding:2px 4px}
+.acc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left}
+.acc:hover{border-color:var(--border-strong)}
+.acc b{font-size:14px}
+
+/* compliance grid */
+.cgrid{display:grid;gap:3px;align-items:center}
+.cgrid .c{height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px}
+.c.sub{background:#CFE6D7;color:var(--good)}
+.c.late{background:#F6E2A8;color:var(--warn)}
+.c.miss{background:#F2C3B8;color:var(--bad)}
+.c.off{background:#EFEFEB;color:#9A9A94}
+.c.hol{background:var(--info-bg);color:var(--info)}
+.c.fut{background:transparent;border:1px dashed var(--border)}
+.c.hd{background:transparent;color:var(--faint)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .dow{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:4px 6px}
+.cal .day{min-height:96px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left}
+.cal .day.we{background:var(--surface-2)}
+.cal .day.out{visibility:hidden}
+.cal .day.sel{border-color:var(--text)}
+.cal .day .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* index */
+.screen-list a{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);text-decoration:none}
+.screen-list a:hover{border-color:var(--text)}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:14px 16px;gap:12px}
+  .nav{flex-direction:row;flex-wrap:wrap}.nav .label{display:none}
+  .me{margin:0;border:0;padding:0}
+  .main{padding:24px 16px 48px}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .frow{flex-wrap:wrap}.frow .proof{width:100%;justify-content:flex-start}
+  .split{flex-direction:column}
+  .split > aside{width:100%!important;position:static!important}
+}
+@media print{
+  .sidebar,.no-print,body::before{display:none!important}
+  .app{display:block}.main{padding:0;max-width:none}
+  body{background:#fff}.card{break-inside:avoid}
+}
+
+</style>
+<script>
+/* Yallo GTM Tracker prototype: shared shell, sample data and helpers.
+   All data here is SAMPLE data for the prototype. Nothing is saved; refreshing a page resets it. */
+(function () {
+  const LOGO = '<svg width="22" height="22" viewBox="0 0 300 300" aria-hidden="true">' +
+    ['M19.6,214.3c0-32.4,26.1-58.7,58.3-58.7h58.3v58.7c0,32.4-26.1,58.7-58.3,58.7s-58.3-26.3-58.3-58.7Z',
+     'M272.5,78.9c0,32.4-26.1,58.7-58.3,58.7h-58.3v-58.7c0-32.4,26.1-58.7,58.3-58.7s58.3,26.3,58.3,58.7Z',
+     'M19.6,78.9c0,32.4,26.1,58.7,58.3,58.7h58.3v-58.7c0-32.4-26.1-58.7-58.3-58.7s-58.3,26.3-58.3,58.7Z',
+     'M272.5,214.3c0-32.4-26.1-58.7-58.3-58.7h-58.3v58.7c0,32.4,26.1,58.7,58.3,58.7s58.3-26.3,58.3-58.7Z']
+      .map(d => '<path fill-rule="evenodd" fill="#D4A843" d="' + d + '"/>').join('') + '</svg>';
+
+  const NAV = {
+    contributor: [
+      { label: 'My work' },
+      { href: 'home.html', text: 'Home', key: 'home' },
+      { href: 'daily-log.html', text: 'Daily log', key: 'daily', badge: '1 missing' },
+      { href: 'weekly-log.html', text: 'Weekly log', key: 'weekly' },
+      { href: 'my-tasks.html', text: 'My tasks', key: 'tasks', badge: '1 overdue' },
+      { href: 'abm-tracker.html', text: 'ABM tracker', key: 'abm' }
+    ],
+    manager: [
+      { label: 'Team' },
+      { href: 'dashboard.html', text: 'Dashboard', key: 'dashboard' },
+      { href: 'weekly-report.html', text: 'Weekly report', key: 'report' },
+      { href: 'person.html', text: 'People', key: 'person' },
+      { href: 'task-management.html', text: 'Task management', key: 'taskmgmt' },
+      { href: 'abm-tracker.html?as=manager', text: 'ABM tracker', key: 'abm' },
+      { label: 'Setup' },
+      { href: 'calendar.html', text: 'Holidays and leave', key: 'calendar' },
+      { href: 'settings.html', text: 'Targets and fields', key: 'settings' }
+    ]
+  };
+
+  const TEAM = [
+    { id: 'tanzil', name: 'Tanzil', initials: 'TZ' },
+    { id: 'anil', name: 'Anil', initials: 'AN' },
+    { id: 'tamre', name: 'Tamre', initials: 'TM' }
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function roleFromPage() {
+    const q = new URLSearchParams(location.search).get('as');
+    if (q === 'manager' || q === 'contributor') return q;
+    return document.body.dataset.role || 'contributor';
+  }
+
+  function renderShell() {
+    const side = document.getElementById('sidebar');
+    if (!side) return;
+    const role = roleFromPage();
+    const active = document.body.dataset.page;
+    const items = NAV[role].map(it => {
+      if (it.label) return '<div class="label">' + esc(it.label) + '</div>';
+      const cur = it.key === active ? ' aria-current="page"' : '';
+      const badge = it.badge && role === 'contributor' ? '<span class="pill bad">' + esc(it.badge) + '</span>' : '';
+      return '<a href="' + it.href + '"' + cur + '><span>' + esc(it.text) + '</span>' + badge + '</a>';
+    }).join('');
+    const me = role === 'manager'
+      ? { i: 'RA', n: 'Raphy', r: 'Admin · GTM lead' }
+      : { i: 'TZ', n: 'Tanzil', r: 'Contributor' };
+    const switchTo = role === 'manager'
+      ? '<a href="home.html">Switch to contributor view</a>'
+      : '<a href="dashboard.html">Switch to manager view</a>';
+    side.innerHTML =
+      '<a class="brand" href="index.html" aria-label="All screens">' + LOGO + '<b>YALLO</b><small>GTM</small></a>' +
+      '<nav class="nav" aria-label="Main">' + items + '</nav>' +
+      '<div class="me"><div class="avatar">' + me.i + '</div><div class="who"><b>' + me.n + '</b><span>' + me.r + '</span></div></div>' +
+      '<div class="role-switch">Prototype: ' + switchTo + '</div>';
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    let t = document.querySelector('.toast');
+    if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.add('hidden'), 3200);
+  }
+
+  function pillClass(status) {
+    return ({ 'Done': 'good', 'Submitted': 'good', 'In progress': 'info', 'Blocked': 'bad', 'Overdue': 'bad', 'Late': 'warn', 'Not started': '' })[status] || '';
+  }
+
+  // Sample backlog tasks (dates in 2026). today = Tue 29 Sep.
+  const TASKS = [
+    { id: 1, title: 'Draft 3 LinkedIn posts on AI delivery', desc: 'Three posts for the saasinator AI page, one per week in October. Use the delivery case themes Raphy shared.', owner: 'tanzil', due: '2026-09-25', priority: 'High', status: 'Blocked', note: 'Waiting for approved case theme list.' },
+    { id: 2, title: 'Clean the filtered contacts list for UAE banking', desc: 'Remove duplicates and anyone who left the account in the last 6 months.', owner: 'tanzil', due: '2026-09-29', priority: 'Medium', status: 'Not started' },
+    { id: 3, title: 'Build the October newsletter in Accumba', desc: 'Newsletter for the Yallo Talent list. Two stories and one open role.', owner: 'tanzil', due: '2026-09-30', priority: 'High', status: 'In progress' },
+    { id: 4, title: 'Update the SAP talent one-pager', desc: 'Refresh proof points from the approved list only.', owner: 'tanzil', due: '2026-10-06', priority: 'Low', status: 'Not started' },
+    { id: 5, title: 'Research pack for next ABM account', desc: 'Org chart, 5 personas, recent news and hiring signals.', owner: 'anil', due: '2026-10-01', priority: 'High', status: 'In progress' },
+    { id: 6, title: 'Fix broken form on the contact page', desc: 'Form submits but no email arrives. Check with the web team.', owner: 'anil', due: '2026-09-26', priority: 'High', status: 'Not started' },
+    { id: 7, title: 'Poster set for the AI Academy webinar', desc: 'Three sizes: LinkedIn post, story, email header.', owner: 'tamre', due: '2026-10-02', priority: 'Medium', status: 'In progress' },
+    { id: 8, title: 'GEO audit of the top 10 pages', desc: 'Check how the pages answer common buyer questions in AI search tools.', owner: 'tamre', due: '2026-09-24', priority: 'Medium', status: 'Done', proof: 'geo-audit.pdf' }
+  ];
+  const TODAY = '2026-09-29';
+  function fmtDate(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
+    const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()];
+    return wd + ' ' + d.getDate() + ' ' + mo;
+  }
+  function dueInfo(t) {
+    if (t.status === 'Done') return { text: 'Done', cls: 'good' };
+    if (t.due < TODAY) return { text: 'Overdue · ' + fmtDate(t.due), cls: 'bad' };
+    if (t.due === TODAY) return { text: 'Due today', cls: 'warn' };
+    return { text: 'Due ' + fmtDate(t.due), cls: '' };
+  }
+  function person(id) { return TEAM.find(p => p.id === id) || { name: id, initials: '?' }; }
+
+  window.GTM = { LOGO, TEAM, TASKS, TODAY, esc, toast, pillClass, renderShell, role: roleFromPage, fmtDate, dueInfo, person };
+  document.addEventListener('DOMContentLoaded', renderShell);
+})();
+
+</script>
+</head>
+<body data-page="home" data-role="contributor">
+<div class="app">
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main">
+  <div class="page-head">
+    <div class="titles">
+      <span class="eyebrow">Tuesday 29 September 2026</span>
+      <h1>Good afternoon, Tanzil</h1>
+    </div>
+    <span class="sample">Sample data</span>
+  </div>
+
+  <div class="banner bad" role="alert">
+    <div class="msg">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A83A28" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16.5v.5"/></svg>
+      <div><b>Monday 28 September is missing</b><span>Fill it in first. Today's log stays locked until Monday is submitted, and Monday will be marked late.</span></div>
+    </div>
+    <a class="btn" href="daily-log.html">Fill Monday</a>
+  </div>
+
+  <div class="grid g3">
+    <div class="card stack">
+      <span class="kicker">Today's log</span>
+      <span class="stat">Not started</span>
+      <span class="small muted">Due 7pm · 13 fields and 2 task updates</span>
+      <a class="btn btn-primary" href="daily-log.html">Open daily log</a>
+    </div>
+    <div class="card stack">
+      <span class="kicker">Logging streak</span>
+      <span class="stat">0 days</span>
+      <span class="small muted">Reset by the missed Monday. Best this quarter: 11 days.</span>
+    </div>
+    <div class="card stack">
+      <span class="kicker">Weekly log</span>
+      <span class="stat">Opens Friday</span>
+      <span class="small muted">Due Monday 5 October, 12pm</span>
+      <a class="btn" href="weekly-log.html">Preview weekly log</a>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <section class="card">
+      <div class="card-head"><h2>This week against target</h2><span class="sub">Mon 28 Sep to Fri 2 Oct</span></div>
+      <div class="stack" id="metrics" style="gap:14px"></div>
+      <p class="xs faint" style="margin-top:16px">Targets are set by Raphy. Black means on pace for the week so far; grey-blue means behind.</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>My open tasks</h2>
+        <div class="seg" role="tablist" aria-label="Filter tasks" id="filters"></div>
+      </div>
+      <div class="stack" id="tasks"></div>
+      <a class="btn btn-ghost btn-sm" href="my-tasks.html" style="margin-top:8px;align-self:flex-start">All my tasks</a>
+    </section>
+  </div>
+
+  <section class="card tight between">
+    <div class="stack" style="gap:4px">
+      <span class="kicker">This week's ABM account</span>
+      <b style="font-size:16px">[Account name] · Yallo Talent · UAE</b>
+    </div>
+    <div class="row" style="flex-wrap:wrap">
+      <span class="pill">Research</span>
+      <span class="pill info">Assets ready</span>
+      <span class="pill warn">Live by Fri 2 Oct</span>
+      <a class="btn btn-sm" href="abm-tracker.html">Open tracker</a>
+    </div>
+  </section>
+</main>
+</div>
+<script>
+const metrics = [
+  ['Emails sent', 40, 100], ['LinkedIn direct messages', 12, 50], ['Calls made', 8, 25],
+  ['New accounts added', 6, 10], ['Contacts added', 180, 250], ['LinkedIn posts', 1, 5]
+];
+const paceShare = 2 / 5; // two of five working days gone
+document.getElementById('metrics').innerHTML = metrics.map(([label, done, target]) => {
+  const pct = Math.min(100, Math.round(done / target * 100));
+  const onPace = done / target >= paceShare;
+  return `<div class="stack" style="gap:6px"><div class="between small"><span>${label}</span><span class="mono muted">${done} / ${target}</span></div>
+    <div class="bar"><i class="${onPace ? '' : 'behind'}" style="width:${pct}%"></i></div></div>`;
+}).join('');
+
+const tasks = [
+  { title: 'Draft 3 LinkedIn posts on AI delivery', due: 'Overdue · was due Fri 25 Sep', kind: 'overdue', priority: 'High', status: 'Blocked' },
+  { title: 'Clean the filtered contacts list for UAE banking', due: 'Due today', kind: 'today', priority: 'Medium', status: 'Not started' },
+  { title: 'Build the October newsletter in Accumba', due: 'Due Wed 30 Sep', kind: 'later', priority: 'High', status: 'In progress' }
+];
+let filter = 'all';
+function draw() {
+  document.getElementById('filters').innerHTML = [['all', 'All 3'], ['today', 'Due today'], ['overdue', 'Overdue']]
+    .map(([k, l]) => `<button role="tab" aria-selected="${filter === k}" data-f="${k}">${l}</button>`).join('');
+  const list = tasks.filter(t => filter === 'all' || t.kind === filter);
+  document.getElementById('tasks').innerHTML = list.length ? list.map(t => `
+    <a href="my-tasks.html" class="card tight" style="text-decoration:none;display:flex;flex-direction:column;gap:6px;background:var(--surface-2)">
+      <div class="between"><b class="small">${t.title}</b><span class="pill ${GTM.pillClass(t.status)}">${t.status}</span></div>
+      <div class="row xs muted"><span style="color:${t.kind === 'overdue' ? 'var(--bad)' : ''}">${t.due}</span><span>Priority ${t.priority}</span><span>Assigned by Raphy</span></div>
+    </a>`).join('') : '<p class="small muted">Nothing here.</p>';
+}
+document.getElementById('filters').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { filter = b.dataset.f; draw(); } });
+draw();
+</script>
+</body>
+</html>

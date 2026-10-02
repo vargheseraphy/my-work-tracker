@@ -1,0 +1,31 @@
+# Local services for the Yallo GTM Tracker.
+#   docker compose up -d     start
+#   docker compose down      stop (data is kept in the named volume)
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gtm_owner          # owner role: runs migrations only
+      POSTGRES_PASSWORD: gtm_owner_local_only
+      POSTGRES_DB: gtm
+      TZ: UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - gtm_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gtm_owner -d gtm"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP the app sends to
+      - "8025:8025"   # web inbox: http://localhost:8025
+
+volumes:
+  gtm_pgdata:
