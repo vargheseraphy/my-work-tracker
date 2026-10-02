@@ -48,11 +48,13 @@ export async function readSession(token: string): Promise<SessionUser | undefine
   const id = hashToken(token);
 
   return asApp(async (client) => {
+    // auth_profile() is a SECURITY DEFINER function (migration 0007): row-level security hides
+    // profiles from gtm_app, and a session has to be read before there is a user context.
     const row = await one<SessionRow>(
       client,
       `select p.id, p.email, p.full_name as "fullName", p.role, p.timezone, s.last_seen_at
          from auth.sessions s
-         join public.profiles p on p.id = s.user_id
+         cross join lateral public.auth_profile(s.user_id) p
         where s.id = $1
           and s.expires_at > now()
           and s.last_seen_at > now() - ($2 || ' hours')::interval

@@ -54,8 +54,10 @@ export async function signIn(email: string, password: string): Promise<SessionUs
       const failed = user.failed_logins + 1;
       await client.query(
         `update auth.users
-            set failed_logins = $2,
-                locked_until = case when $2 >= $3 then now() + ($4 || ' minutes')::interval else locked_until end
+            set failed_logins = $2::int,
+                locked_until = case when $2::int >= $3::int
+                                    then now() + ($4 || ' minutes')::interval
+                                    else locked_until end
           where id = $1`,
         [user.id, failed, MAX_FAILED_LOGINS, String(LOCK_MINUTES)],
       );
@@ -65,7 +67,7 @@ export async function signIn(email: string, password: string): Promise<SessionUs
     const profile = await one<ProfileRow>(
       client,
       `select id, email, full_name as "fullName", role, timezone, active
-         from public.profiles where id = $1`,
+         from public.auth_profile($1)`,
       [user.id],
     );
     if (!profile || !profile.active) return { kind: 'inactive' as const };
@@ -156,7 +158,7 @@ export async function usePasswordToken(
     return one<ProfileRow>(
       client,
       `select id, email, full_name as "fullName", role, timezone, active
-         from public.profiles where id = $1`,
+         from public.auth_profile($1)`,
       [row.user_id],
     );
   });
@@ -187,7 +189,7 @@ export async function startReset(email: string): Promise<IssuedToken | undefined
     const row = await one<{ id: string }>(
       client,
       `select u.id from auth.users u
-         join public.profiles p on p.id = u.id
+         cross join lateral public.auth_profile(u.id) p
         where u.email = $1 and p.active`,
       [email],
     );
