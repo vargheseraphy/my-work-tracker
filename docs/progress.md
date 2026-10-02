@@ -34,11 +34,11 @@ Invented test logins created by the seed. Local only. Not real people.
 
 | Role | Email | Password |
 | --- | --- | --- |
-| Raphy | raphy@example.test | willow-lantern-8ed6 |
-| Tanzil | tanzil@example.test | pebble-harbour-957a |
-| Anil | anil@example.test | meadow-pebble-1895 |
-| Tamre | tamre@example.test | amber-meadow-458f |
-| Leadership | viewer@example.test | amber-summit-5680 |
+| Raphy | raphy@example.test | lantern-quartz-49d4 |
+| Tanzil | tanzil@example.test | summit-summit-a244 |
+| Anil | anil@example.test | quartz-summit-c647 |
+| Tamre | tamre@example.test | meadow-amber-b3ca |
+| Leadership | viewer@example.test | willow-willow-78b3 |
 
 ## Open items
 
