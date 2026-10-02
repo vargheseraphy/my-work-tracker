@@ -39,6 +39,12 @@ export async function homeRoutes(app: FastifyInstance): Promise<void> {
       const targets = await readTargets(client, user.id, monday);
       const weekDays = await countWeekDays(client, user.id, monday, today);
 
+      const working = await one<{ isWorkingDay: boolean }>(
+        client,
+        'select is_working_day($1, $2) as "isWorkingDay"',
+        [user.id, today],
+      );
+
       const weeklyOpen = await one<{ isOpen: boolean }>(
         client,
         `select local_now($1) >= ($2::date + 4 + coalesce((setting('weekly_open_time') #>> '{}')::time, '16:00')) as "isOpen"`,
@@ -48,6 +54,7 @@ export async function homeRoutes(app: FastifyInstance): Promise<void> {
       return {
         user: { ...user, today },
         today,
+        todayIsWorkingDay: working?.isWorkingDay ?? false,
         todayStatus: (todayEntry?.status as HomeDto['todayStatus']) ?? 'missing',
         missingDays: missing,
         backfillDays: backfill,

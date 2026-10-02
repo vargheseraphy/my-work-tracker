@@ -209,6 +209,8 @@ export interface TargetProgressDto {
 export interface HomeDto {
   user: SessionUser;
   today: IsoDate;
+  /** False at a weekend, on a holiday, on leave, or before the person's start date. */
+  todayIsWorkingDay: boolean;
   todayStatus: EntryStatus | 'missing';
   missingDays: IsoDate[];
   backfillDays: IsoDate[];

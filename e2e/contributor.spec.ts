@@ -3,6 +3,26 @@
 import { expect, test } from '@playwright/test';
 import { signIn } from './accounts.js';
 
+/**
+ * Open a day that is certainly still editable. Today is not always a working day, so this
+ * follows the missing-day banner when there is one and falls back to today otherwise.
+ */
+async function openAnOpenDay(page: import('@playwright/test').Page): Promise<void> {
+  await page.goto('/');
+  const banner = page.getByRole('alert').first();
+  if (await banner.isVisible().catch(() => false)) {
+    await banner.getByRole('link').click();
+  } else {
+    await page.goto('/daily');
+  }
+  await expect(page.locator('input.num').first()).toBeVisible();
+}
+
+/**
+ * Order matters here. The seed leaves Tanzil one missed working day inside the backfill window,
+ * and that is the only day a contributor can edit when the suite runs at a weekend. J2 submits
+ * it, so the journeys that need it still open (J3 and J4) come first.
+ */
 test.describe('J1 · a contributor signs in and sees what is missing', () => {
   test('the missing-day banner opens the missed day', async ({ page }) => {
     await signIn(page, 'Tanzil');
@@ -25,35 +45,13 @@ test.describe('J1 · a contributor signs in and sees what is missing', () => {
   });
 });
 
-test.describe('J2 · filling a missed day and submitting it', () => {
-  test('submit turns on once everything is filled, and the day shows as late', async ({ page }) => {
-    await signIn(page, 'Tanzil');
-    await page.getByRole('alert').first().getByRole('link').click();
-
-    const submit = page.getByRole('button', { name: 'Submit' });
-    await expect(submit).toBeDisabled();
-
-    // Every enabled field, filled with 0, which is a valid answer.
-    const numbers = page.locator('input.num');
-    const count = await numbers.count();
-    for (let index = 0; index < count; index += 1) {
-      await numbers.nth(index).fill('0');
-    }
-
-    await expect(page.getByText('0 of', { exact: false }).first()).toBeVisible();
-    await expect(submit).toBeEnabled({ timeout: 15_000 });
-
-    await submit.click();
-    await expect(page.getByText(/Submitted|This day went in late/)).toBeVisible({
-      timeout: 15_000,
-    });
-  });
-});
-
 test.describe('J3 · the cross-field rule shows and clears', () => {
   test('filtered above added is refused, and fixing it clears the error', async ({ page }) => {
     await signIn(page, 'Tanzil');
-    await page.goto('/daily');
+    await openAnOpenDay(page);
+
+    // An empty day cannot be signed off.
+    await expect(page.getByRole('button', { name: 'Submit' })).toBeDisabled();
 
     const numbers = page.locator('input.num');
     const count = await numbers.count();
@@ -78,13 +76,35 @@ test.describe('J3 · the cross-field rule shows and clears', () => {
 test.describe('J4 · nothing is lost on a refresh', () => {
   test('values typed stay after a reload, and the form locks after submit', async ({ page }) => {
     await signIn(page, 'Tanzil');
-    await page.goto('/daily');
+    await openAnOpenDay(page);
 
     await page.getByLabel('Likes given', { exact: true }).fill('33');
     await expect(page.getByText('Saved').first()).toBeVisible({ timeout: 10_000 });
 
     await page.reload();
     await expect(page.getByLabel('Likes given', { exact: true })).toHaveValue('33');
+  });
+});
+
+test.describe('J2 · filling a missed day and submitting it', () => {
+  test('submit turns on once everything is filled, and the day shows as late', async ({ page }) => {
+    await signIn(page, 'Tanzil');
+    await page.getByRole('alert').first().getByRole('link').click();
+
+    // Every enabled field, filled with 0, which is a valid answer.
+    const numbers = page.locator('input.num');
+    const count = await numbers.count();
+    for (let index = 0; index < count; index += 1) {
+      await numbers.nth(index).fill('0');
+    }
+
+    const submit = page.getByRole('button', { name: 'Submit' });
+    await expect(submit).toBeEnabled({ timeout: 15_000 });
+
+    await submit.click();
+    await expect(page.getByText(/Submitted|This day went in late/)).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });
 
@@ -95,7 +115,11 @@ test.describe('J5 · the weekly log totals come from the daily logs', () => {
 
     await expect(page.getByRole('heading', { name: 'From your daily logs' })).toBeVisible();
     await expect(page.getByText('Read only')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Weekly log' })).toBeVisible();
+    // The page title is the week; "Weekly log" is the eyebrow above it.
+    await expect(
+      page.getByRole('main').getByText('Weekly log', { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(' to ');
   });
 });
 

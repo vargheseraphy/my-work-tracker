@@ -87,14 +87,20 @@ export function Home() {
       <div className="grid g3">
         <StatCard
           kicker="Today's log"
-          stat={STATUS_WORD[data.todayStatus] ?? 'Not started'}
+          stat={
+            data.todayIsWorkingDay
+              ? (STATUS_WORD[data.todayStatus] ?? 'Not started')
+              : 'Not a working day'
+          }
           note={
-            dayLocked
-              ? 'Locked until the missing day is submitted'
-              : `Due 7pm · ${data.targets.length > 0 ? 'fields and task updates' : 'fields'}`
+            !data.todayIsWorkingDay
+              ? 'Nothing is due from you today.'
+              : dayLocked
+                ? 'Locked until the missing day is submitted'
+                : 'Due 7pm, in your own time zone'
           }
           action={
-            <LinkButton to="/daily" tone={dayLocked ? 'default' : 'primary'}>
+            <LinkButton to="/daily" tone={dayLocked || !data.todayIsWorkingDay ? 'default' : 'primary'}>
               Open daily log
             </LinkButton>
           }

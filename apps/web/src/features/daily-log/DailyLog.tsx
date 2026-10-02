@@ -9,6 +9,7 @@ import {
   formatDayLong,
   formatDayShort,
   type EntryScreenDto,
+  type HomeDto,
   type MetricDefinition,
   type SubmitResult,
   type TaskStatus,
@@ -43,12 +44,22 @@ export function DailyLog() {
   const [errors, setErrors] = useState<string[]>([]);
   const [openError, setOpenError] = useState<string | null>(null);
 
-  // With no date in the path, the server opens today.
   const { data: home } = useQuery({
     queryKey: ['home'],
-    queryFn: () => api.get<{ today: string }>('/home'),
+    queryFn: () => api.get<HomeDto>('/home'),
   });
-  const day = date ?? home?.today;
+
+  /**
+   * With no date in the path: today when it is a working day, otherwise the most recent day
+   * still waiting to be filled in. At a weekend with nothing outstanding there is no day at all.
+   */
+  const day =
+    date ??
+    (home
+      ? home.todayIsWorkingDay
+        ? home.today
+        : (home.backfillDays.at(-1) ?? null)
+      : undefined);
 
   const screen = useQuery({
     queryKey: ['entry', 'daily', day],
@@ -109,7 +120,29 @@ export function DailyLog() {
     return tabs.sort((a, b) => a.day.localeCompare(b.day));
   }, [data, day]);
 
-  if (!day || screen.isPending) return <Loading what="Opening the day" />;
+  if (day === undefined) return <Loading what="Opening the day" />;
+
+  // A weekend, a holiday or leave, with nothing outstanding behind it.
+  if (day === null) {
+    return (
+      <>
+        <PageHead eyebrow="Daily log" title={formatDayLong(home!.today)} />
+        <Card className="stack" tight>
+          <span className="kicker">Nothing to log</span>
+          <h2 style={{ fontSize: 22 }}>Today is not a working day for you.</h2>
+          <p className="muted small" style={{ maxWidth: 520 }}>
+            There is nothing outstanding either. The daily log opens again on your next working
+            day.
+          </p>
+          <LinkButton to="/" tone="primary">
+            Back to home
+          </LinkButton>
+        </Card>
+      </>
+    );
+  }
+
+  if (screen.isPending) return <Loading what="Opening the day" />;
 
   if (screen.error) {
     const message =
