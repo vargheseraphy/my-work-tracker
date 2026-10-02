@@ -3,6 +3,16 @@
 import { expect, test } from '@playwright/test';
 import { signIn } from './accounts.js';
 
+/** A weekday a few days back: the seed has filled it in for every contributor. */
+function aPastWorkingDay(): string {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() - 3);
+  while (date.getUTCDay() === 0 || date.getUTCDay() === 6) {
+    date.setUTCDate(date.getUTCDate() - 1);
+  }
+  return date.toISOString().slice(0, 10);
+}
+
 test.describe('narrow screens', () => {
   test('the sidebar becomes a top bar and the page does not scroll sideways', async ({ page }) => {
     test.skip(page.viewportSize()!.width > 500, 'This is the narrow-screen run');
@@ -24,7 +34,8 @@ test.describe('narrow screens', () => {
     test.skip(page.viewportSize()!.width > 500, 'This is the narrow-screen run');
 
     await signIn(page, 'Tanzil');
-    await page.goto('/daily');
+    // A day already logged, so the form and its panel are both on screen whatever the weekday.
+    await page.goto(`/daily/${aPastWorkingDay()}`);
 
     const form = page.locator('.col-main');
     const aside = page.locator('aside').last();

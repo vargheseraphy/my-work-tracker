@@ -21,7 +21,7 @@ export async function reportRoutes(app: FastifyInstance): Promise<void> {
       'Content-Disposition',
       `attachment; filename="gtm-${formatMonth(month).toLowerCase().replace(' ', '-')}.csv"`,
     );
-    // A BOM so Excel opens the file as UTF-8.
-    return reply.send(`﻿${csv}`);
+    // A byte-order mark, so Excel opens the file as UTF-8.
+    return reply.send(`\uFEFF${csv}`);
   });
 }

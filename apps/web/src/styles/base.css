@@ -213,6 +213,7 @@ textarea {
   gap: 24px;
   max-width: 1240px;
   width: 100%;
+  min-width: 0;
 }
 
 .page-head {
@@ -364,7 +365,9 @@ textarea {
 
 @media (max-width: 900px) {
   .app {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr), not 1fr: a plain 1fr track grows to fit a wide child, which would make
+       the whole page scroll sideways instead of the wide card scrolling inside itself. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .sidebar {
     position: static;

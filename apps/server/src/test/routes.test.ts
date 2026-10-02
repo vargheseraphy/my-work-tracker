@@ -632,7 +632,7 @@ describe('the report and the export', () => {
     expect(String(response.headers['content-disposition'])).toContain('attachment');
 
     const lines = response.body.split('\r\n');
-    expect(lines[0]).toMatch(/^﻿?Person,Measure,01,02/);
+    expect(lines[0]).toMatch(/^\uFEFF?Person,Measure,01,02/);
     const emailsRow = lines.find((l) => l.startsWith('Tanzil,Emails sent'));
     expect(emailsRow).toBeDefined();
     expect(emailsRow!.endsWith(',12')).toBe(true);

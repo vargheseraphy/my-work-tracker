@@ -5,6 +5,8 @@
  */
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+// Brings in the cookie decorators @fastify/cookie adds to the request and reply.
+import type {} from '@fastify/cookie';
 import { forbidden, signinRequired } from './errors.js';
 import { readSession, SESSION_COOKIE, type SessionUser } from './auth/sessions.js';
 import { checkCsrf } from './security.js';

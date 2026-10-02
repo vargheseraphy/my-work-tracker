@@ -28,11 +28,8 @@ export default defineWorkspace([
       testTimeout: 30_000,
       // One database, shared by every file: run one file at a time in one process, or a
       // truncate in one file wipes the people another file is in the middle of using.
-      fileParallelism: false,
       pool: 'forks',
-      poolOptions: { forks: { singleFork: true, minForks: 1, maxForks: 1 } },
-      maxWorkers: 1,
-      minWorkers: 1,
+      poolOptions: { forks: { singleFork: true } },
       sequence: { concurrent: false },
     },
   },

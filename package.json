@@ -17,7 +17,7 @@
     "dev:web": "npm run dev --workspace @gtm/web",
     "build": "npm run build --workspace @gtm/shared && npm run build --workspace @gtm/server && npm run build --workspace @gtm/web",
     "lint": "eslint .",
-    "typecheck": "tsc -b --force",
+    "typecheck": "tsc -b --force && tsc -p tsconfig.tools.json",
     "test": "vitest run",
     "e2e": "playwright test",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run e2e",
@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.49.1",
     "@types/node": "^22.10.5",
     "@types/node-cron": "^3.0.11",

@@ -4,6 +4,8 @@
  */
 
 import type { FastifyReply } from 'fastify';
+// Brings in the cookie decorators @fastify/cookie adds to the request and reply.
+import type {} from '@fastify/cookie';
 import { asApp, one } from '../db.js';
 import { config } from '../config.js';
 import { hashToken, newToken } from './passwords.js';
