@@ -8,3 +8,5 @@
 | 2 Oct 2026 | Reminders sent by a scheduler inside the server, over SMTP | Plan | Works from a laptop; Mailpit for testing, any SMTP provider for real |
 | 2 Oct 2026 | Rules and access enforced in PostgreSQL (functions and row-level security) | Plan | One place for rules; the app cannot bypass them; same on Neon |
 | 2 Oct 2026 | Backfill window 2 working days | Plan default | One setting (app_settings.backfill_working_days); Raphy to confirm |
+| 3 Oct 2026 | Four stack versions moved on from the ones CLAUDE.md names, to clear security advisories | Claude | `npm audit --omit=dev` has to be clean at release (docs/SECURITY.md "Dependencies"). nodemailer 6 carried a high-severity advisory, and file-type 19, react-router-dom 6 and node-cron 3 carried moderate ones. Now on nodemailer 10, file-type 22, react-router-dom 7 and node-cron 4. The whole suite passes on all four, and `npm audit --omit=dev` reports nothing. |
+
