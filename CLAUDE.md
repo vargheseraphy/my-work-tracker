@@ -58,7 +58,8 @@ If two sources disagree, follow the higher one, write the conflict in docs/BLOCK
     screen part. Never bundle a whole phase into one commit. Aim for 10 or more commits per phase.
   - Message format: `P3 DAY-04: proof upload and attachment row` (phase, requirement ID if any,
     what changed, sentence case). Stage only the files for that change (`git add <paths>`).
-  - Never push, never rewrite history, never amend a previous commit.
+  - Pushing, amending a previous commit and rewriting history are all allowed when Raphy asks
+    for them.
 - Update docs/progress.md at the end of every phase: status, what was built, test counts,
   anything left.
 - If a command or test fails three times the same way, stop retrying it: record it in
