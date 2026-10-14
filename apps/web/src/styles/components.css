@@ -790,10 +790,15 @@
   padding: 64px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+  justify-content: flex-start;
+  /* Line grid from the brand manual. --pat carries its own tone per theme. */
+  background-image: linear-gradient(var(--pat) 1px, transparent 1px),
+    linear-gradient(90deg, var(--pat) 1px, transparent 1px);
   background-size: 24px 24px;
+}
+/* The mark sits at the top, the message is centred in whatever space is left. */
+.signin .hero .stack {
+  margin-block: auto;
 }
 .signin .hero h1 {
   font-size: 44px;
@@ -808,7 +813,7 @@
 .lockup .t {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   line-height: 1;
 }
 .lockup .t b {
