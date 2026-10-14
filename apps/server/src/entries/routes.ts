@@ -17,6 +17,7 @@ import {
   readEntry,
   readFields,
   setNoSearchActivity,
+  awardWeekTarget,
   submitEntry,
   upsertValue,
   weekAutoTotals,
@@ -106,7 +107,14 @@ export async function entriesRoutes(app: FastifyInstance): Promise<void> {
   app.post('/entries/:id/submit', async (request) => {
     const user = requireContributor(request);
     const { id } = idParam.parse(request.params);
-    return withUser(user.id, async (client) => submitEntry(client, id));
+    return withUser(user.id, async (client) => {
+      const result = await submitEntry(client, id);
+      // A sign-off can be the thing that completes the week. Awarding here, inside the same
+      // transaction, means the congratulations and the manager's notification either both
+      // happen or neither does (db/migrations/0010).
+      if (result.ok) await awardWeekTarget(client, user.id);
+      return result;
+    });
   });
 
   /** Own history. */

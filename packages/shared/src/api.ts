@@ -223,6 +223,19 @@ export interface HomeDto {
   weeklyIsOpen: boolean;
   abmThisWeek: AbmAccountDto | null;
   streak: StreakDto;
+  /** An unread win worth interrupting for. Null almost always. */
+  celebration: CelebrationDto | null;
+}
+
+/**
+ * A moment worth stopping the screen for. It is an ordinary notification row underneath, which
+ * is what makes "your manager has been told" true rather than decorative: the manager has a row
+ * of their own. Marking it read is what dismisses it, so it shows once and never nags.
+ */
+export interface CelebrationDto {
+  id: string;
+  title: string;
+  body: string;
 }
 
 /**

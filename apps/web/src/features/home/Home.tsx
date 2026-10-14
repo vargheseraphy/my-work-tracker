@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   formatDayLong,
   formatDayShort,
@@ -28,6 +28,7 @@ import {
   StatCard,
 } from '../../components/ui.jsx';
 import { StreakCard } from './StreakCard.jsx';
+import { Celebration } from './Celebration.jsx';
 
 const STATUS_WORD: Record<string, string> = {
   missing: 'Not started',
@@ -49,6 +50,13 @@ type Filter = 'all' | 'today' | 'overdue';
 export function Home() {
   const user = useUser();
   const [filter, setFilter] = useState<Filter>('all');
+  const queryClient = useQueryClient();
+
+  // Dismissing marks the notification read, which is also what stops it coming back.
+  const dismiss = useMutation({
+    mutationFn: (id: string) => api.post(`/notifications/${id}/read`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['home'] }),
+  });
 
   const { data, isPending, error } = useQuery({
     queryKey: ['home'],
@@ -68,6 +76,13 @@ export function Home() {
 
   return (
     <>
+      {data.celebration ? (
+        <Celebration
+          celebration={data.celebration}
+          onDismiss={() => dismiss.mutate(data.celebration!.id)}
+        />
+      ) : null}
+
       <PageHead eyebrow={formatDayLong(data.today)} title={`${greeting()}, ${user.fullName}`} />
 
       {firstMissing ? (

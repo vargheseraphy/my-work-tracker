@@ -4,7 +4,13 @@
  */
 
 import type { FastifyInstance } from 'fastify';
-import { weekMonday, type HomeDto, type StreakDto, type TargetProgressDto } from '@gtm/shared';
+import {
+  weekMonday,
+  type CelebrationDto,
+  type HomeDto,
+  type StreakDto,
+  type TargetProgressDto,
+} from '@gtm/shared';
 import { many, one, withUser } from '../db.js';
 import { requireUser } from '../context.js';
 import { backfillDays, localToday, missingDays } from '../entries/service.js';
@@ -67,6 +73,7 @@ export async function homeRoutes(app: FastifyInstance): Promise<void> {
         weeklyIsOpen: weeklyOpen?.isOpen ?? false,
         abmThisWeek: owned.find((a) => a.plannedWeek === monday) ?? null,
         streak: await countStreak(client, user.id),
+        celebration: await readCelebration(client, user.id),
       };
     });
   });
@@ -145,4 +152,24 @@ async function countStreak(
     lastLogged: row?.lastLogged ?? null,
     nextMilestone: STREAK_MILESTONES.find((m) => m > current) ?? null,
   };
+}
+
+/**
+ * The newest unread win. Reading it is what dismisses it, so a person is congratulated once and
+ * never pestered about the same week twice.
+ */
+async function readCelebration(
+  client: Parameters<typeof one>[0],
+  userId: string,
+): Promise<CelebrationDto | null> {
+  const row = await one<CelebrationDto>(
+    client,
+    `select id, title, body
+       from notifications
+      where user_id = $1 and rule_key = 'week_target_met' and read_at is null
+      order by created_at desc
+      limit 1`,
+    [userId],
+  );
+  return row ?? null;
 }

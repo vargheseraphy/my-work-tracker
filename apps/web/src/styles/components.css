@@ -915,3 +915,69 @@
     opacity: 1;
   }
 }
+
+/* ---------- celebration (the one time the app interrupts) ---------- */
+.celebrate-back {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--ink) 48%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+.celebrate {
+  width: 420px;
+  max-width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 28px;
+}
+.celebrate h2 {
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 0;
+}
+.celebrate p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.celebrate .btn {
+  margin-top: 6px;
+  min-width: 140px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .celebrate {
+    animation: celebrate-in 260ms ease-out;
+  }
+  .celebrate .burst {
+    animation: burst-in 420ms ease-out;
+  }
+}
+@keyframes celebrate-in {
+  from {
+    transform: translateY(8px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes burst-in {
+  from {
+    transform: scale(0.6) rotate(-25deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}

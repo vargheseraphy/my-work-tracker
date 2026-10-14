@@ -308,3 +308,16 @@ export async function appSettings(client: PoolClient): Promise<Record<string, un
   );
   return Object.fromEntries(rows.map((r) => [r.key, r.value]));
 }
+
+/**
+ * Award "every target hit this week" if it has just become true (db/migrations/0010).
+ * Returns true only on the run that awarded it, so the caller can celebrate exactly once.
+ */
+export async function awardWeekTarget(client: PoolClient, userId: string): Promise<boolean> {
+  const row = await one<{ awarded: boolean }>(
+    client,
+    'select award_week_target($1) as awarded',
+    [userId],
+  );
+  return row?.awarded ?? false;
+}
