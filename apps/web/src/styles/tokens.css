@@ -1,41 +1,217 @@
-/* Design tokens, copied from design/home.html. docs/DESIGN.md is the reference.
-   Gold is only ever the 3 px top bar, the active menu marker, eyebrow rules and progress bars:
-   never text, never a fill behind text. */
+/* Design tokens for the Repotra brand, from design/brand-theme/my-report-tracker-brand-manual.md.
+   Light and dark are both defined here. Every text tone passes WCAG AAA on its surface.
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+   Two naming layers live in this file:
+   1. Brand tokens (--ink, --accent, --line, --r-card) are the names the manual uses. Prefer these.
+   2. Legacy aliases (--text, --gold, --border, --radius) map the older names onto the brand
+      values so base.css and components.css keep working. Do not add new uses of the aliases.
+
+   Accent is the one main action per view and the focus ring. It is never a text colour on
+   white, never a chart colour, and never a fill behind body text. */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
 
 :root {
-  --bg: #f5f5f3;
+  /* Surfaces */
+  --bg: #f5f4fa;
   --surface: #ffffff;
-  --surface-2: #fafaf8;
-  --border: #e4e4e0;
-  --border-strong: #cfcfc9;
+  --surface-2: #efedf7;
+  --line: #d5d8e3;
+  --line-strong: #b9bed0;
 
-  --text: #111111;
-  --muted: #555555;
-  --faint: #6e6e6e;
+  /* Text, highest to lowest. Nothing lighter than --muted carries text. */
+  --ink: #0b1424;
+  --ink-2: #1b2a44;
+  --muted: #34415a;
 
-  --gold: #d4a843;
-  --gold-light: #f0c866;
-  --gold-tint: #fbf5e6;
+  /* Action */
+  --accent: #4b3fd1;
+  --accent-ink: #ffffff;
+  --accent-tint: #ece9fb;
+  --link: #0052a3;
 
-  --good: #2b6e45;
-  --good-bg: #e7f2eb;
-  --good-line: #b9dbc6;
+  /* Status. Always paired with a word, never colour alone. */
+  --good: #0a6b34;
+  --good-bg: #e3f5ea;
+  --good-line: #b4ddc5;
 
-  --bad: #a83a28;
-  --bad-bg: #fbece8;
-  --bad-line: #edc2b8;
+  --warn: #8a4200;
+  --warn-bg: #fff0dd;
+  --warn-line: #ebcda4;
 
-  --warn: #7a5200;
-  --warn-bg: #fff3d6;
-  --warn-line: #ebd49a;
+  --bad: #a61d12;
+  --bad-bg: #fde6e3;
+  --bad-line: #f0bdb6;
 
-  --info: #34465a;
-  --info-bg: #e9eef3;
-  --info-line: #c4d0dc;
+  --info: #4d5872;
+  --info-bg: #eceef5;
+  --info-line: #c9cfdf;
 
-  --radius: 12px;
-  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Chart categories */
+  --c1: #4b3fd1;
+  --c2: #0b74b8;
+  --c3: #08806f;
+  --c4: #b86a00;
+  --c5: #b5287a;
+  --c6: #4d5872;
+
+  /* Orb hues. Backgrounds and glass only, never text. */
+  --orb-violet: #a493ff;
+  --orb-cyan: #6fd3ff;
+  --orb-peach: #ffbe98;
+  --orb-pink: #f59ad9;
+  --band-from: #ffffff;
+  --band-to: #ece8ff;
+
+  /* Glass */
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-edge: rgba(255, 255, 255, 0.95);
+  --glass-sheen: rgba(255, 255, 255, 0.75);
+  --pat: rgba(75, 63, 209, 0.3);
+
+  /* Depth */
+  --shadow: 0 1px 2px rgba(11, 20, 36, 0.1), 0 2px 6px rgba(11, 20, 36, 0.08);
+  --shadow-lg: 0 10px 30px rgba(43, 32, 140, 0.16);
+
+  /* Shape. Nothing is a pill; avatars only are round. */
+  --r-btn: 4px;
+  --r-card: 10px;
+  --r-panel: 14px;
+
+  /* Type */
+  --font:
+    'Segoe UI Variable Text', 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-display:
+    'Segoe UI Variable Display', 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-data: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Legacy aliases. Existing rules in base.css and components.css read these. */
+  --text: var(--ink);
+  --faint: var(--muted);
+  --border: var(--line);
+  --border-strong: var(--line-strong);
+  --gold: var(--accent);
+  --gold-light: var(--orb-violet);
+  --gold-tint: var(--accent-tint);
+  --radius: var(--r-card);
+  --mono: var(--font-data);
+
+  color-scheme: light;
+}
+
+/* Dark. The same values under both selectors, so the toggle wins in either direction. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #070b16;
+    --surface: #0f1626;
+    --surface-2: #17213a;
+    --line: #2b3756;
+    --line-strong: #3c4a6e;
+
+    --ink: #f5f7fc;
+    --ink-2: #e0e6f2;
+    --muted: #c3ccdd;
+
+    --accent: #a79dff;
+    --accent-ink: #0b1424;
+    --accent-tint: #1e1b40;
+    --link: #8cc6ff;
+
+    --good: #6bdca2;
+    --good-bg: #0f3324;
+    --good-line: #1d5c42;
+
+    --warn: #ffbe70;
+    --warn-bg: #3a2610;
+    --warn-line: #6b4518;
+
+    --bad: #ff9a8c;
+    --bad-bg: #3d1713;
+    --bad-line: #6e2a22;
+
+    --info: #aeb9d0;
+    --info-bg: #1a2236;
+    --info-line: #333f5c;
+
+    --c1: #a79dff;
+    --c2: #5cc3ff;
+    --c3: #3fd6c0;
+    --c4: #ffb547;
+    --c5: #ff86c8;
+    --c6: #aeb9d0;
+
+    --orb-violet: #5b45e8;
+    --orb-cyan: #0e86c2;
+    --orb-peach: #c2643c;
+    --orb-pink: #b03a92;
+    --band-from: #0a1020;
+    --band-to: #17123a;
+
+    --glass: rgba(20, 30, 56, 0.5);
+    --glass-edge: rgba(255, 255, 255, 0.22);
+    --glass-sheen: rgba(255, 255, 255, 0.1);
+    --pat: rgba(167, 157, 255, 0.32);
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.55);
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #070b16;
+  --surface: #0f1626;
+  --surface-2: #17213a;
+  --line: #2b3756;
+  --line-strong: #3c4a6e;
+
+  --ink: #f5f7fc;
+  --ink-2: #e0e6f2;
+  --muted: #c3ccdd;
+
+  --accent: #a79dff;
+  --accent-ink: #0b1424;
+  --accent-tint: #1e1b40;
+  --link: #8cc6ff;
+
+  --good: #6bdca2;
+  --good-bg: #0f3324;
+  --good-line: #1d5c42;
+
+  --warn: #ffbe70;
+  --warn-bg: #3a2610;
+  --warn-line: #6b4518;
+
+  --bad: #ff9a8c;
+  --bad-bg: #3d1713;
+  --bad-line: #6e2a22;
+
+  --info: #aeb9d0;
+  --info-bg: #1a2236;
+  --info-line: #333f5c;
+
+  --c1: #a79dff;
+  --c2: #5cc3ff;
+  --c3: #3fd6c0;
+  --c4: #ffb547;
+  --c5: #ff86c8;
+  --c6: #aeb9d0;
+
+  --orb-violet: #5b45e8;
+  --orb-cyan: #0e86c2;
+  --orb-peach: #c2643c;
+  --orb-pink: #b03a92;
+  --band-from: #0a1020;
+  --band-to: #17123a;
+
+  --glass: rgba(20, 30, 56, 0.5);
+  --glass-edge: rgba(255, 255, 255, 0.22);
+  --glass-sheen: rgba(255, 255, 255, 0.1);
+  --pat: rgba(167, 157, 255, 0.32);
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.55);
+
+  color-scheme: dark;
 }
