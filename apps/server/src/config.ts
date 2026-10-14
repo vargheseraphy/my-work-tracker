@@ -34,7 +34,7 @@ const schema = z.object({
   SMTP_SECURE: bool.default(false),
   SMTP_USER: z.string().default(''),
   SMTP_PASS: z.string().default(''),
-  EMAIL_FROM: z.string().min(1).default('Yallo GTM <gtm-tracker@localhost>'),
+  EMAIL_FROM: z.string().min(1).default('Repotra <repotra@localhost>'),
 
   JOBS_ENABLED: bool.default(true),
   REMINDER_CRON: z.string().min(1).default('*/15 * * * *'),

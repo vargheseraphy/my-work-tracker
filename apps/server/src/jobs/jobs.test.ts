@@ -204,7 +204,7 @@ describe('NTF-01 · reminders become emails', () => {
 
     const text = await messageText(unlock!.ID);
     expect(text).toContain('The email count looked wrong.');
-    expect(text).toContain('Yallo GTM tracker');
+    expect(text).toContain('Repotra');
   });
 
   it('only the job runner may call the queue functions', async () => {

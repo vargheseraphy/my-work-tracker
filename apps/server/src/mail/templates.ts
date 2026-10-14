@@ -1,7 +1,10 @@
 /**
  * One plain layout for every email (docs/EMAIL.md section 3):
- * white background, 3 px gold top bar, black text, one black button, a footer saying why the
- * person received it. Every value is escaped. No images and no tracking pixels.
+ * white card, 3 px accent top bar, ink text, one ink button, a footer saying why the person
+ * received it. Every value is escaped. No images and no tracking pixels.
+ *
+ * Colours are literal hex, not tokens: email clients do not support CSS custom properties.
+ * They mirror the light theme in design/brand-theme. Keep them in step by hand.
  */
 
 import { config } from '../config.js';
@@ -44,8 +47,8 @@ export function layout(input: LayoutInput): { html: string; text: string } {
     url && input.buttonLabel
       ? `<tr><td style="padding:8px 32px 28px">
            <a href="${escapeHtml(url)}"
-              style="display:inline-block;background:#111111;color:#FFFFFF;text-decoration:none;
-                     padding:11px 20px;border-radius:9px;font-size:14px;font-weight:600">
+              style="display:inline-block;background:#0B1424;color:#F5F4FA;text-decoration:none;
+                     padding:11px 20px;border-radius:4px;font-size:14px;font-weight:600">
              ${escapeHtml(input.buttonLabel)}
            </a>
          </td></tr>`
@@ -53,18 +56,18 @@ export function layout(input: LayoutInput): { html: string; text: string } {
 
   const html = `<!doctype html>
 <html lang="en-GB"><head><meta charset="utf-8" /><title>${title}</title></head>
-<body style="margin:0;padding:24px;background:#F5F5F3;
-             font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;color:#111111">
+<body style="margin:0;padding:24px;background:#F5F4FA;
+             font-family:'Segoe UI','Noto Sans',system-ui,-apple-system,sans-serif;color:#0B1424">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-         style="max-width:560px;margin:0 auto;background:#FFFFFF;border:1px solid #E4E4E0;border-radius:12px">
-    <tr><td style="height:3px;background:#D4A843;border-radius:12px 12px 0 0;font-size:0;line-height:0">&nbsp;</td></tr>
+         style="max-width:560px;margin:0 auto;background:#FFFFFF;border:1px solid #D5D8E3;border-radius:10px">
+    <tr><td style="height:3px;background:#4B3FD1;border-radius:10px 10px 0 0;font-size:0;line-height:0">&nbsp;</td></tr>
     <tr><td style="padding:28px 32px 4px">
       <h1 style="margin:0;font-size:19px;line-height:1.35;font-weight:700">${title}</h1>
     </td></tr>
-    <tr><td style="padding:10px 32px 20px;font-size:14px;line-height:1.6;color:#333333">${body}</td></tr>
+    <tr><td style="padding:10px 32px 20px;font-size:14px;line-height:1.6;color:#1B2A44">${body}</td></tr>
     ${button}
-    <tr><td style="padding:16px 32px 24px;border-top:1px solid #E4E4E0;font-size:12px;line-height:1.5;color:#6E6E6E">
-      Yallo GTM tracker<br />${footer}
+    <tr><td style="padding:16px 32px 24px;border-top:1px solid #D5D8E3;font-size:12px;line-height:1.5;color:#34415A">
+      Repotra<br />${footer}
     </td></tr>
   </table>
 </body></html>`;
@@ -76,7 +79,7 @@ export function layout(input: LayoutInput): { html: string; text: string } {
     url ? `\n${input.buttonLabel}: ${url}` : '',
     '',
     '—',
-    'Yallo GTM tracker',
+    'Repotra',
     input.footer,
   ]
     .filter((line) => line !== null)
@@ -107,13 +110,13 @@ export function notificationEmail(input: {
 
 export function invitePasswordEmail(to: string, fullName: string, link: string): Mail {
   const { html, text } = layout({
-    title: 'Set your password for the Yallo GTM tracker',
+    title: 'Set your password for Repotra',
     body: `${fullName}, your account is ready. Choose a password to sign in. The link works for 48 hours.`,
     buttonLabel: 'Set your password',
     buttonUrl: link,
     footer: 'You received this because an admin invited you to the tracker.',
   });
-  return { to, subject: 'Set your password for the Yallo GTM tracker', html, text };
+  return { to, subject: 'Set your password for Repotra', html, text };
 }
 
 export function resetPasswordEmail(to: string, link: string): Mail {
