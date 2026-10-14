@@ -24,6 +24,7 @@ import {
   ProgressAside,
   ProofSlot,
 } from '../../components/fields.jsx';
+import { BrandPicker } from '../../components/BrandPicker.jsx';
 import {
   Banner,
   Card,
@@ -43,6 +44,8 @@ export function DailyLog() {
   const toast = useToast();
   const [errors, setErrors] = useState<string[]>([]);
   const [openError, setOpenError] = useState<string | null>(null);
+  // Which account the per-brand fields are showing. Null until the screen loads.
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
 
   const { data: home } = useQuery({
     queryKey: ['home'],
@@ -159,6 +162,7 @@ export function DailyLog() {
   if (!data) return <Empty>That day could not be opened.</Empty>;
 
   const editable = data.entry.status === 'draft' || data.entry.status === 'unlocked';
+  const brandId = selectedBrand ?? data.brands[0]?.id ?? null;
   const groups = [...new Set(data.fields.map((f) => f.groupName))];
 
   const mirror = checkDaily({
@@ -198,6 +202,16 @@ export function DailyLog() {
       />
 
       {openError ? <Banner tone="bad" role="alert" title={openError} /> : null}
+
+      {editable && data.brands.length > 0 ? (
+        <BrandPicker
+          brands={data.brands}
+          value={brandId ?? ''}
+          onChange={setSelectedBrand}
+          fields={data.fields}
+          values={data.entry.values}
+        />
+      ) : null}
 
       {data.entry.periodStart < data.today && editable ? (
         <Banner
@@ -254,7 +268,10 @@ export function DailyLog() {
                       (f) =>
                         f.groupName === group &&
                         data.entry.values.some(
-                          (v) => v.metricKey === f.key && v.numValue !== null,
+                          (v) =>
+                            v.metricKey === f.key &&
+                            v.numValue !== null &&
+                            v.brandId === (f.perBrand && data.brands.length > 0 ? brandId : null),
                         ),
                     ).length
                   }{' '}
@@ -266,11 +283,13 @@ export function DailyLog() {
                 .filter((field) => field.groupName === group)
                 .map((field) => (
                   <FieldRow
-                    key={field.key}
+                    // Keyed by brand so inputs reset to that account's values on switch.
+                    key={`${field.key}-${field.perBrand ? brandId : 'all'}`}
                     field={field}
                     data={data}
                     editable={editable}
                     onChanged={refresh}
+                    selectedBrand={brandId}
                   />
                 ))}
             </Card>
@@ -339,13 +358,19 @@ function FieldRow({
   data,
   editable,
   onChanged,
+  selectedBrand,
 }: {
   field: MetricDefinition;
   data: EntryScreenDto;
   editable: boolean;
   onChanged: () => void;
+  selectedBrand: string | null;
 }) {
-  const value = data.entry.values.find((v) => v.metricKey === field.key);
+  // Channel measures belong to one account at a time; CRM work is a single shared total.
+  const brandId = field.perBrand && data.brands.length > 0 ? selectedBrand : null;
+  const value = data.entry.values.find(
+    (v) => v.metricKey === field.key && v.brandId === brandId,
+  );
   const number = value?.numValue ?? null;
   const average = data.fourWeekAverage[field.key] ?? 0;
   const needsNote =
@@ -371,6 +396,7 @@ function FieldRow({
           <span className="hint">{hint}</span>
         </span>
         <NumberField
+          brandId={brandId}
           entryId={data.entry.id}
           field={field}
           initialValue={number}
