@@ -44,9 +44,32 @@
 .lp-close {
   padding-block: var(--lp-pad);
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
 }
 .lp-band {
   background: var(--bg);
+}
+/* A faintly tinted band, so sections alternate in weight rather than all being flat white. */
+.lp-band-tint {
+  background: linear-gradient(180deg, #fbfaff, var(--bg));
+}
+.lp-product {
+  background: linear-gradient(180deg, var(--bg), #f6f4fd);
+  border-block: 1px solid var(--line);
+}
+.lp-steps {
+  background: linear-gradient(180deg, #f7f5fd, var(--bg));
+}
+.lp-close {
+  background:
+    radial-gradient(
+      60% 70% at 50% 0%,
+      color-mix(in srgb, var(--orb-violet) 30%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--bg), #efecfb);
+  border-top: 1px solid var(--line);
 }
 
 /* ---------- reveal ----------
@@ -88,70 +111,49 @@
   }
 }
 
-/* ---------- orbs ---------- */
-.lp-orbs {
+/* ---------- per-band bloom ----------
+   One soft, slow light source per section, so the page keeps the hero's sense of depth all the
+   way down instead of flattening into a stack of boxes. */
+.lp-bloom {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  z-index: 0;
 }
-.lp-orb {
+.lp-bloom span {
   position: absolute;
   border-radius: 50%;
-  filter: blur(8px);
-  opacity: 0.85;
+  filter: blur(70px);
 }
-.lp-orb.o1 {
-  width: 540px;
-  height: 540px;
-  left: -140px;
-  top: -120px;
-  background: radial-gradient(
-    circle at 60% 60%,
-    var(--orb-violet),
-    color-mix(in srgb, var(--orb-violet) 26%, transparent) 60%,
-    transparent 72%
-  );
-  animation: drift-a 24s ease-in-out infinite alternate;
+.lp-bloom-a {
+  width: 520px;
+  height: 420px;
+  left: -8%;
+  top: -14%;
+  background: color-mix(in srgb, var(--orb-violet) 26%, transparent);
+  animation: bloom-a 30s ease-in-out infinite alternate;
 }
-.lp-orb.o2 {
+.lp-bloom-b {
   width: 440px;
-  height: 440px;
-  right: -120px;
-  top: -80px;
-  background: radial-gradient(
-    circle at 50% 55%,
-    var(--orb-cyan),
-    color-mix(in srgb, var(--orb-cyan) 24%, transparent) 58%,
-    transparent 72%
-  );
-  animation: drift-b 26s ease-in-out infinite alternate;
+  height: 380px;
+  right: -6%;
+  bottom: -18%;
+  background: color-mix(in srgb, var(--orb-cyan) 24%, transparent);
+  animation: bloom-b 36s ease-in-out infinite alternate;
 }
-.lp-orb.o3 {
-  width: 360px;
-  height: 360px;
-  right: 24%;
-  bottom: -180px;
-  background: radial-gradient(
-    circle at 50% 50%,
-    var(--orb-pink),
-    color-mix(in srgb, var(--orb-peach) 30%, transparent) 58%,
-    transparent 72%
-  );
-  animation: drift-a 22s ease-in-out infinite alternate-reverse;
-}
-@keyframes drift-a {
+@keyframes bloom-a {
   to {
-    transform: translate3d(40px, 30px, 0) scale(1.08);
+    transform: translate(46px, 34px) scale(1.12);
   }
 }
-@keyframes drift-b {
+@keyframes bloom-b {
   to {
-    transform: translate3d(-34px, 26px, 0) scale(1.06);
+    transform: translate(-40px, -28px) scale(1.1);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lp-orb {
+  .lp-bloom span {
     animation: none;
   }
 }
@@ -212,10 +214,24 @@
   position: relative;
   isolation: isolate;
   padding-block: 128px 0;
-  /* Near-monochrome. One violet bloom lives inside the glass art; nothing else is tinted. */
+  /* Bright and airy. The dashboard is the only dark object, which is what makes it the subject. */
   background:
-    radial-gradient(90% 60% at 50% -10%, #272a30, transparent 70%),
-    linear-gradient(180deg, #1c1e22, #16181b);
+    radial-gradient(
+      62% 48% at 14% 0%,
+      color-mix(in srgb, var(--orb-cyan) 42%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      54% 42% at 88% 4%,
+      color-mix(in srgb, var(--orb-pink) 34%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      70% 54% at 50% 96%,
+      color-mix(in srgb, var(--orb-violet) 40%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, #ffffff, #f3f1fb);
   overflow: hidden;
 }
 @media (max-width: 860px) {
@@ -260,8 +276,9 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-2);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
@@ -287,14 +304,15 @@
   border-radius: var(--r-btn);
 }
 .lp-btn-glass {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(255, 255, 255, 0.95);
   color: var(--ink);
+  box-shadow: var(--shadow);
   -webkit-backdrop-filter: blur(18px) saturate(1.4);
   backdrop-filter: blur(18px) saturate(1.4);
 }
 .lp-btn-glass:hover {
-  background: rgba(255, 255, 255, 0.11);
+  background: #fff;
 }
 
 /* ---------- the tilted stage ---------- */
@@ -316,11 +334,11 @@
   transform: translateX(-50%);
   background: radial-gradient(
     50% 60% at 50% 50%,
-    color-mix(in srgb, var(--accent) 40%, transparent),
+    color-mix(in srgb, var(--accent) 55%, transparent),
     transparent 70%
   );
-  filter: blur(40px);
-  opacity: 0.55;
+  filter: blur(46px);
+  opacity: 0.5;
 }
 .lp-tilt {
   position: relative;
@@ -344,9 +362,10 @@
   border-radius: 18px;
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow:
-    0 50px 120px -30px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    0 60px 120px -40px rgba(32, 24, 92, 0.55),
+    0 24px 50px -24px rgba(32, 24, 92, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 @media (prefers-reduced-motion: reduce) {
   .lp-tilt {
@@ -356,8 +375,10 @@
 
 /* ---------- proof strip ---------- */
 .lp-strip {
+  position: relative;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 #fff inset;
 }
 .lp-strip-in {
   display: grid;
@@ -412,7 +433,7 @@
   color: var(--accent);
   border: 1.5px solid transparent;
   background:
-    linear-gradient(var(--surface-2), var(--surface-2)) padding-box,
+    linear-gradient(180deg, #fff, #f6f4fd) padding-box,
     conic-gradient(
         from 140deg,
         var(--orb-violet),
@@ -439,18 +460,25 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 26px;
-  background: var(--surface);
+  padding: 28px;
+  background: linear-gradient(180deg, #fff, #fcfbff);
   border: 1px solid var(--line);
   border-radius: var(--r-panel);
-  box-shadow: var(--shadow);
+  /* Layered, low-opacity shadows read as depth; one hard shadow reads as a sticker. */
+  box-shadow:
+    0 1px 2px rgba(32, 24, 92, 0.05),
+    0 8px 20px -10px rgba(32, 24, 92, 0.14),
+    inset 0 1px 0 #fff;
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.28s ease;
 }
 .lp-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(32, 24, 92, 0.06),
+    0 26px 50px -18px rgba(32, 24, 92, 0.26),
+    inset 0 1px 0 #fff;
 }
 .lp-card h3 {
   font-size: 17px;
@@ -471,17 +499,26 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 26px;
+  padding: 28px;
   border-radius: var(--r-panel);
-  background: var(--surface);
+  background: linear-gradient(180deg, #fff, #fcfbff);
   border: 1px solid var(--line);
+  box-shadow:
+    0 1px 2px rgba(32, 24, 92, 0.05),
+    0 8px 20px -12px rgba(32, 24, 92, 0.12),
+    inset 0 1px 0 #fff;
   transition:
-    transform 0.25s ease,
-    border-color 0.25s ease;
+    transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
 }
 .lp-tile:hover {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+  box-shadow:
+    0 2px 4px rgba(32, 24, 92, 0.06),
+    0 26px 50px -18px rgba(32, 24, 92, 0.22),
+    inset 0 1px 0 #fff;
 }
 .lp-tile-wide {
   grid-column: 1 / -1;
@@ -561,11 +598,23 @@
 }
 .lp-mini {
   margin: 0;
-  padding: 20px;
+  padding: 22px;
   border-radius: var(--r-panel);
-  background: var(--surface);
+  background: linear-gradient(180deg, #fff, #fcfbff);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow);
+  box-shadow:
+    0 1px 2px rgba(32, 24, 92, 0.05),
+    0 18px 40px -20px rgba(32, 24, 92, 0.24),
+    inset 0 1px 0 #fff;
+}
+/* Offset, so the pair reads as two objects at different depths rather than a list. */
+.lp-mini + .lp-mini {
+  margin-left: 26px;
+}
+@media (max-width: 860px) {
+  .lp-mini + .lp-mini {
+    margin-left: 0;
+  }
 }
 .lp-mini-on {
   border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
@@ -906,7 +955,29 @@
 }
 
 
-/* ---------- moving glass art ---------- */
+/* ---------- moving glass art ----------
+   The material is tokenised so the same shapes work on a bright ground and a dark one.
+   On light it is white frost over the aurora; on dark it is lit glass. */
+.lp {
+  --ga-hi: #fff;
+  --ga-hi-o: 0.78;
+  --ga-mid-o: 0.42;
+  --ga-lo-o: 0.14;
+  --ga-edge-a: 1;
+  --ga-edge-b: 0.38;
+  --ga-edge-c: 0.7;
+  --ga-spec-o: 0.85;
+}
+.lp .theme-dark,
+.theme-dark .lp {
+  --ga-hi-o: 0.2;
+  --ga-mid-o: 0.06;
+  --ga-lo-o: 0.02;
+  --ga-edge-a: 0.55;
+  --ga-edge-b: 0.12;
+  --ga-edge-c: 0.3;
+  --ga-spec-o: 0.42;
+}
 .ga {
   position: absolute;
   inset: 0;
@@ -1006,13 +1077,16 @@
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1px;
   background: var(--line);
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: var(--r-panel);
   overflow: hidden;
+  box-shadow:
+    0 2px 4px rgba(32, 24, 92, 0.05),
+    0 30px 60px -28px rgba(32, 24, 92, 0.3);
 }
 .lp-answers article {
-  background: var(--bg);
-  padding: 30px 26px;
+  background: linear-gradient(180deg, #fff, #fcfbff);
+  padding: 32px 28px;
   display: flex;
   flex-direction: column;
   gap: 10px;

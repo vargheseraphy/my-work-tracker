@@ -37,7 +37,7 @@ export function Landing() {
       </header>
 
       {/* 1 ─ hero: the product is the hero, tilted and breaking past the fold */}
-      <section className="theme-dark lp-hero">
+      <section className="lp-hero">
         <GlassArt />
         <div className="lp-wrap lp-hero-in">
           <span className="lp-pill" data-reveal>
@@ -61,14 +61,15 @@ export function Landing() {
         {/* Tilted, lit from beneath, and deliberately cut off by the fold. */}
         <div className="lp-stage">
           <div className="lp-stage-glow" aria-hidden="true" />
-          <div className="lp-tilt">
+          {/* The one dark object on a bright page, which is what makes it the focal point. */}
+          <div className="lp-tilt theme-dark">
             <DashboardShot />
           </div>
         </div>
       </section>
 
       {/* 2 ─ proof strip */}
-      <section className="theme-dark lp-strip">
+      <section className="lp-strip">
         <div className="lp-wrap lp-strip-in">
           {[
             { big: '3 brands', small: 'tracked separately, by whoever runs them' },
@@ -85,6 +86,7 @@ export function Landing() {
 
       {/* 3 ─ the pain */}
       <section className="lp-band" id="pain">
+        <Bloom />
         <div className="lp-wrap">
           <header className="lp-head" data-reveal>
             <span className="eyebrow">The Monday morning problem</span>
@@ -111,7 +113,8 @@ export function Landing() {
       </section>
 
       {/* 4 ─ what the screen tells you */}
-      <section className="theme-dark lp-product" id="product">
+      <section className="lp-product" id="product">
+        <Bloom />
         <div className="lp-wrap">
           <header className="lp-head lp-head-centre" data-reveal>
             <span className="eyebrow">Your Monday view</span>
@@ -129,7 +132,8 @@ export function Landing() {
       </section>
 
       {/* 5 ─ features */}
-      <section className="lp-band" id="features">
+      <section className="lp-band lp-band-tint" id="features">
+        <Bloom />
         <div className="lp-wrap">
           <header className="lp-head" data-reveal>
             <span className="eyebrow">What it does</span>
@@ -156,8 +160,8 @@ export function Landing() {
       </section>
 
       {/* 6 ─ how it works */}
-      <section className="theme-dark lp-steps">
-        <Orbs />
+      <section className="lp-steps">
+        <Bloom />
         <div className="lp-wrap">
           <header className="lp-head" data-reveal>
             <span className="eyebrow">How it works</span>
@@ -179,6 +183,7 @@ export function Landing() {
 
       {/* 7 ─ for the team */}
       <section className="lp-band" id="team">
+        <Bloom />
         <div className="lp-wrap">
           <header className="lp-head" data-reveal>
             <span className="eyebrow">For the people doing the work</span>
@@ -223,8 +228,8 @@ export function Landing() {
       </section>
 
       {/* 8 ─ close */}
-      <section className="theme-dark lp-close">
-        <Orbs />
+      <section className="lp-close">
+        <Bloom />
         <div className="lp-wrap lp-close-in" data-reveal>
           <h2>Give your Monday back.</h2>
           <p className="lp-lead">
@@ -237,7 +242,7 @@ export function Landing() {
         </div>
       </section>
 
-      <footer className="theme-dark lp-foot">
+      <footer className="lp-foot">
         <div className="lp-wrap lp-foot-in">
           <span className="lp-brand">
             <Logo size={18} />
@@ -250,13 +255,15 @@ export function Landing() {
   );
 }
 
-/** Three drifting orbs. Decorative, and the only thing on the page that moves on its own. */
-function Orbs() {
+/**
+ * One soft bloom per band, drifting slowly. Keeps the hero's sense of light and depth running
+ * down the page without repeating the full glass composition, which would be noisy at this size.
+ */
+function Bloom() {
   return (
-    <div className="lp-orbs" aria-hidden="true">
-      <span className="lp-orb o1" />
-      <span className="lp-orb o2" />
-      <span className="lp-orb o3" />
+    <div className="lp-bloom" aria-hidden="true">
+      <span className="lp-bloom-a" />
+      <span className="lp-bloom-b" />
     </div>
   );
 }

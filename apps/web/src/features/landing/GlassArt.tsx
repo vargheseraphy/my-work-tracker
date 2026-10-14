@@ -5,6 +5,9 @@
  * a bright top edge, a specular highlight, and a soft inner shadow. They drift on long, offset
  * cycles so the composition never repeats visibly.
  *
+ * The material is driven by --ga-* tokens rather than fixed white, so the same shapes read as
+ * frosted glass on a bright ground and as lit glass on a dark one.
+ *
  * All decoration: aria-hidden, pointer-events none, and every animation stops under
  * prefers-reduced-motion.
  */
@@ -16,18 +19,18 @@ export function GlassArt() {
         <defs>
           {/* One glass material, reused. Light from the top left, as everywhere else. */}
           <linearGradient id="ga-pane" x1="0" y1="0" x2="0.6" y2="1">
-            <stop offset="0%" stopColor="#fff" stopOpacity=".20" />
-            <stop offset="45%" stopColor="#fff" stopOpacity=".06" />
-            <stop offset="100%" stopColor="#fff" stopOpacity=".02" />
+            <stop offset="0%" stopColor="var(--ga-hi)" stopOpacity="var(--ga-hi-o)" />
+            <stop offset="45%" stopColor="var(--ga-hi)" stopOpacity="var(--ga-mid-o)" />
+            <stop offset="100%" stopColor="var(--ga-hi)" stopOpacity="var(--ga-lo-o)" />
           </linearGradient>
           <linearGradient id="ga-edge" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#fff" stopOpacity=".55" />
-            <stop offset="50%" stopColor="#fff" stopOpacity=".12" />
-            <stop offset="100%" stopColor="#fff" stopOpacity=".30" />
+            <stop offset="0%" stopColor="var(--ga-hi)" stopOpacity="var(--ga-edge-a)" />
+            <stop offset="50%" stopColor="var(--ga-hi)" stopOpacity="var(--ga-edge-b)" />
+            <stop offset="100%" stopColor="var(--ga-hi)" stopOpacity="var(--ga-edge-c)" />
           </linearGradient>
           <linearGradient id="ga-spec" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#fff" stopOpacity=".42" />
-            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--ga-hi)" stopOpacity="var(--ga-spec-o)" />
+            <stop offset="100%" stopColor="var(--ga-hi)" stopOpacity="0" />
           </linearGradient>
           <radialGradient id="ga-glow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="var(--accent)" stopOpacity=".55" />
