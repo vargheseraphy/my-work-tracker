@@ -1,329 +1,344 @@
 /**
- * The public face of Repotra, shown at / to anyone who is not signed in.
+ * The public face of Repotra, at / for anyone not signed in.
  *
- * The product shots are drawn in the page from the same tokens the app uses, not pasted
- * screenshots. That way they cannot go stale, they follow light and dark, and nothing here
- * claims to be a real screen of real people's numbers.
+ * Built to the brand manual: glass only ever sits on an orb ground, one accent action per view,
+ * tight corners, and every text tone at full ink. The product shots are drawn from the same
+ * tokens the app uses, so they cannot go stale and never show real people's numbers.
  *
- * Bands alternate light and dark by putting `theme-dark` on a section, which re-declares the
- * palette for that subtree only.
+ * Every animation is decoration and sits behind prefers-reduced-motion.
  */
 
 import { Link } from 'react-router-dom';
 import { Logo } from '../../components/AppShell.jsx';
+import { DashboardShot } from './DashboardShot.jsx';
+import { useReveal } from './useReveal.js';
 
 export function Landing() {
+  useReveal();
+
   return (
     <div className="lp">
       <header className="lp-nav">
-        <span className="lp-brand">
-          <Logo size={24} />
-          <b>Repotra</b>
-        </span>
-        <Link className="btn btn-primary btn-sm" to="/signin">
-          Sign in
-        </Link>
+        <div className="lp-nav-in">
+          <span className="lp-brand">
+            <Logo size={24} />
+            <b>Repotra</b>
+          </span>
+          <nav className="lp-nav-links" aria-label="Page sections">
+            <a href="#product">Product</a>
+            <a href="#features">Features</a>
+            <a href="#team">For your team</a>
+          </nav>
+          <Link className="btn btn-primary btn-sm" to="/signin">
+            Sign in
+          </Link>
+        </div>
       </header>
 
-      {/* ---------- hero, light ---------- */}
-      <section className="lp-hero">
+      {/* 1 ─ hero */}
+      <section className="theme-dark lp-hero">
+        <Orbs />
         <div className="lp-wrap lp-hero-in">
-          <span className="eyebrow">Daily activity, weekly results</span>
-          <h1>Stop chasing your team for updates.</h1>
-          <p className="lp-lead">
-            Repotra is where a go-to-market team logs what they did each day, and where their
-            manager sees the week take shape without asking anyone a thing. The rules live in the
-            database, so the numbers you read are the numbers that happened.
+          <span className="lp-pill" data-reveal>
+            <i className="lp-pill-dot" />
+            Daily activity, weekly results
+          </span>
+          <h1 data-reveal>
+            Stop chasing your team
+            <br />
+            for <em>updates</em>.
+          </h1>
+          <p className="lp-lead" data-reveal>
+            Repotra is where a go-to-market team logs what they did, and where you see the week
+            take shape without asking anyone a thing. The rules live in the database, so the
+            numbers you read are the numbers that happened.
           </p>
-          <div className="row wrap" style={{ gap: 12 }}>
-            <Link className="btn btn-primary" to="/signin">
+          <div className="lp-cta" data-reveal>
+            <Link className="btn btn-primary lp-btn-lg" to="/signin">
               Sign in
             </Link>
-            <a className="btn" href="#how">
-              See how it works
+            <a className="btn lp-btn-lg lp-btn-glass" href="#product">
+              See the dashboard
             </a>
           </div>
-          <p className="xs muted" style={{ marginTop: 4 }}>
-            Invite only. Your admin sets up accounts.
+          <p className="lp-fine" data-reveal>
+            Invite only · Your admin creates accounts
           </p>
         </div>
       </section>
 
-      {/* ---------- the problem, light ---------- */}
-      <section className="lp-wrap lp-band">
-        <h2 className="lp-h2">The Monday morning problem</h2>
-        <div className="lp-three">
-          <article>
-            <h3>You ask, they guess</h3>
-            <p>
-              Numbers get reconstructed from memory on a Friday afternoon. Nobody is lying; they
-              simply cannot remember Tuesday.
-            </p>
-          </article>
-          <article>
-            <h3>The spreadsheet rots</h3>
-            <p>
-              One person edits the wrong row, another overwrites a formula, and by week three
-              nobody trusts the totals enough to act on them.
-            </p>
-          </article>
-          <article>
-            <h3>You become the chaser</h3>
-            <p>
-              The most expensive person on the team spends Monday sending reminders instead of
-              reading results.
-            </p>
-          </article>
+      {/* 2 ─ proof strip */}
+      <section className="theme-dark lp-strip">
+        <div className="lp-wrap lp-strip-in">
+          {[
+            { big: '3 brands', small: 'tracked separately, by whoever runs them' },
+            { big: '09:00 Monday', small: 'the week already written, in your inbox' },
+            { big: 'Zero chasing', small: 'reminders go out in each person’s time zone' },
+          ].map((item) => (
+            <div key={item.big} data-reveal>
+              <b>{item.big}</b>
+              <span>{item.small}</span>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ---------- the dashboard, dark ---------- */}
-      <section className="theme-dark lp-dark" id="how">
+      {/* 3 ─ the pain */}
+      <section className="lp-band" id="pain">
         <div className="lp-wrap">
-          <span className="eyebrow">Your Monday view</span>
-          <h2 className="lp-h2">Who logged, who is on pace, what is stuck</h2>
-          <p className="lp-lead">
-            One screen answers the three questions you would otherwise ask in a stand-up.
-          </p>
+          <header className="lp-head" data-reveal>
+            <span className="eyebrow">The Monday morning problem</span>
+            <h2>You are the reason anything gets filled in.</h2>
+            <p className="lp-lead">
+              Every manager running a spreadsheet ends up in the same three places.
+            </p>
+          </header>
 
-          <div className="lp-shot">
-            <ComplianceShot />
-            <PaceShot />
+          <div className="lp-cards">
+            {PAINS.map((pain) => (
+              <article className="lp-card" key={pain.title} data-reveal>
+                <span className="lp-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <path d={pain.icon} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <h3>{pain.title}</h3>
+                <p>{pain.body}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ---------- features, light ---------- */}
-      <section className="lp-wrap lp-band">
-        <h2 className="lp-h2">What it does</h2>
-        <ul className="lp-features">
-          {FEATURES.map((feature) => (
-            <li key={feature.title}>
-              <b>{feature.title}</b>
-              <span>{feature.body}</span>
-            </li>
-          ))}
-        </ul>
+      {/* 4 ─ the product shot */}
+      <section className="theme-dark lp-product" id="product">
+        <Orbs />
+        <div className="lp-wrap">
+          <header className="lp-head lp-head-centre" data-reveal>
+            <span className="eyebrow">Your Monday view</span>
+            <h2>Who logged, who is on pace, what is stuck.</h2>
+            <p className="lp-lead">
+              One screen answers the three questions you would otherwise ask in a stand-up.
+            </p>
+          </header>
+          <DashboardShot />
+        </div>
       </section>
 
-      {/* ---------- for the team, dark ---------- */}
-      <section className="theme-dark lp-dark">
+      {/* 5 ─ features */}
+      <section className="lp-band" id="features">
         <div className="lp-wrap">
-          <span className="eyebrow">For the people doing the work</span>
-          <h2 className="lp-h2">A tracker people are willing to open</h2>
-          <p className="lp-lead">
-            Compliance tools get filled in badly because they feel like surveillance. Repotra is
-            built the other way round: it shows people their own progress first.
-          </p>
-          <div className="lp-shot">
-            <StreakShot />
-            <div className="lp-points">
-              <p>
-                <b>Consistency, not punctuality.</b> A streak counts days logged, late or not.
-                Leave and weekends are skipped, never broken.
-              </p>
-              <p>
-                <b>Nothing can be taken away.</b> Badges are lifetime totals and personal bests,
-                so a quiet fortnight never demotes anyone.
-              </p>
-              <p>
-                <b>A missed day is a nudge.</b> It never locks today. The gap still shows to the
-                manager, but it does not stop the work.
-              </p>
-              <p>
-                <b>An honest zero is welcome.</b> Low numbers are safe to report, which is the
-                only thing that keeps the data real.
-              </p>
+          <header className="lp-head" data-reveal>
+            <span className="eyebrow">What it does</span>
+            <h2>Everything the spreadsheet could not.</h2>
+          </header>
+          <div className="lp-bento">
+            {FEATURES.map((feature, i) => (
+              <article
+                className={`lp-tile${i === 0 ? ' lp-tile-wide' : ''}`}
+                key={feature.title}
+                data-reveal
+              >
+                <span className="lp-ico" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <path d={feature.icon} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <h3>{feature.title}</h3>
+                <p>{feature.body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6 ─ how it works */}
+      <section className="theme-dark lp-steps">
+        <Orbs />
+        <div className="lp-wrap">
+          <header className="lp-head" data-reveal>
+            <span className="eyebrow">How it works</span>
+            <h2>Three moving parts. That is the whole of it.</h2>
+          </header>
+          <ol className="lp-step-list">
+            {STEPS.map((step, i) => (
+              <li key={step.title} data-reveal>
+                <span className="lp-step-n">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* 7 ─ for the team */}
+      <section className="lp-band" id="team">
+        <div className="lp-wrap">
+          <header className="lp-head" data-reveal>
+            <span className="eyebrow">For the people doing the work</span>
+            <h2>A tracker people are willing to open.</h2>
+            <p className="lp-lead">
+              Compliance tools get filled in badly because they feel like surveillance. Repotra
+              shows people their own progress first.
+            </p>
+          </header>
+
+          <div className="lp-split">
+            <div className="lp-mini-cards" data-reveal>
+              <figure className="lp-mini">
+                <figcaption>Consistency</figcaption>
+                <div className="lp-mini-top">
+                  <span aria-hidden="true">🔥</span>
+                  <b>12 days</b>
+                </div>
+                <span className="lp-mini-bar">
+                  <i style={{ width: '60%' }} />
+                </span>
+                <span className="lp-mini-note">8 more days to reach 20</span>
+              </figure>
+              <figure className="lp-mini lp-mini-on">
+                <figcaption>On target · Gold</figcaption>
+                <div className="lp-mini-top">
+                  <b>6 weeks</b>
+                </div>
+                <span className="lp-mini-note">Every target met, six weeks running</span>
+              </figure>
+            </div>
+
+            <div className="lp-points" data-reveal>
+              {POINTS.map((point) => (
+                <p key={point.b}>
+                  <b>{point.b}</b> {point.p}
+                </p>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ---------- what a manager gets back, light ---------- */}
-      <section className="lp-wrap lp-band">
-        <h2 className="lp-h2">What you get back</h2>
-        <div className="lp-three">
-          <article>
-            <h3>Monday morning, already written</h3>
-            <p>
-              The weekly report builds itself from the week&apos;s logs and lands in your inbox at
-              09:00 on Monday. You read it; you do not assemble it.
-            </p>
-          </article>
-          <article>
-            <h3>Pace, not just totals</h3>
-            <p>
-              Every target is measured against how much of the week has actually gone, so Tuesday
-              is judged against Tuesday rather than against Friday.
-            </p>
-          </article>
-          <article>
-            <h3>The chasing is automatic</h3>
-            <p>
-              Reminders go out on their own schedule in each person&apos;s own time zone. You stop
-              being the reason anything gets filled in.
-            </p>
-          </article>
+      {/* 8 ─ close */}
+      <section className="theme-dark lp-close">
+        <Orbs />
+        <div className="lp-wrap lp-close-in" data-reveal>
+          <h2>Give your Monday back.</h2>
+          <p className="lp-lead">
+            Accounts are invite only. Ask your admin to add you, or sign in if you already have
+            one.
+          </p>
+          <Link className="btn btn-primary lp-btn-lg" to="/signin">
+            Sign in
+          </Link>
         </div>
       </section>
 
-      {/* ---------- close ---------- */}
-      <section className="lp-wrap lp-close">
-        <h2 className="lp-h2">Ready when you are</h2>
-        <p className="lp-lead">
-          Accounts are invite only, so ask your admin to add you, or sign in if you already have
-          an account.
-        </p>
-        <Link className="btn btn-primary" to="/signin">
-          Sign in
-        </Link>
-      </section>
-
-      <footer className="lp-foot">
-        <span className="lp-brand">
-          <Logo size={18} />
-          <b>Repotra</b>
-        </span>
-        <span className="xs muted">Daily activity, weekly results.</span>
+      <footer className="theme-dark lp-foot">
+        <div className="lp-wrap lp-foot-in">
+          <span className="lp-brand">
+            <Logo size={18} />
+            <b>Repotra</b>
+          </span>
+          <span className="lp-fine">Daily activity, weekly results.</span>
+        </div>
       </footer>
     </div>
   );
 }
 
-const FEATURES = [
+/** Three drifting orbs. Decorative, and the only thing on the page that moves on its own. */
+function Orbs() {
+  return (
+    <div className="lp-orbs" aria-hidden="true">
+      <span className="lp-orb o1" />
+      <span className="lp-orb o2" />
+      <span className="lp-orb o3" />
+    </div>
+  );
+}
+
+const PAINS = [
   {
-    title: 'Daily and weekly logs',
-    body: 'A short form per working day, and a weekly log that totals the days up for you rather than asking twice.',
+    title: 'You ask, they guess',
+    body: 'Numbers get reconstructed from memory on a Friday afternoon. Nobody is lying; they simply cannot remember Tuesday.',
+    icon: 'M12 8.5v4.5M12 16.5h.01M12 3.2 2.6 20h18.8Z',
   },
   {
-    title: 'Rules the app cannot bypass',
-    body: 'Required fields, whole numbers, sanity checks on sudden spikes. They run in the database, so every route obeys them.',
+    title: 'The spreadsheet rots',
+    body: 'One person edits the wrong row, another overwrites a formula, and by week three nobody trusts the totals enough to act on them.',
+    icon: 'M4 5.5h16v14H4zM4 10h16M9.5 10v9.5M15 14l4 4M19 14l-4 4',
   },
   {
-    title: 'Compliance at a glance',
-    body: 'A month grid of who logged and who did not, with late marked separately from missing.',
-  },
-  {
-    title: 'Targets with pace',
-    body: 'Weekly targets per person per measure, shown as on pace, close or behind, in words as well as colour.',
-  },
-  {
-    title: 'Task backlog',
-    body: 'Assign work with a due date, require a note to block it and proof to finish it, and keep the whole history.',
-  },
-  {
-    title: 'ABM tracker',
-    body: 'One named account taken live each week, with the weeks that slipped shown plainly.',
-  },
-  {
-    title: 'Reminders that respect time zones',
-    body: 'Each person is nudged in their own working day, once per thing, never twice.',
-  },
-  {
-    title: 'Everything exports',
-    body: 'A printable weekly report and a monthly CSV, so the data is never trapped in here.',
+    title: 'You become the chaser',
+    body: 'The most expensive person on the team spends Monday sending reminders instead of reading results.',
+    icon: 'M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10.3 21a1.94 1.94 0 0 0 3.4 0',
   },
 ];
 
-/* ---------- drawn product shots ---------- */
+const FEATURES = [
+  {
+    title: 'Rules the app cannot bypass',
+    body: 'Required fields, whole numbers, a flag on sudden spikes, proof where proof matters. They run inside the database, so every route and every integration obeys them. There is no back door, including for us.',
+    icon: 'M12 3.2 20 6.6v5.2c0 4.6-3.3 8.4-8 9.4-4.7-1-8-4.8-8-9.4V6.6ZM9 12.2l2.2 2.3L15.5 10',
+  },
+  {
+    title: 'Activity per brand',
+    body: 'Run three accounts? Log LinkedIn and email against each one, with the totals still rolling up.',
+    icon: 'M4 7h7v7H4zM13 4h7v7h-7zM13 13h7v7h-7zM4 16h7v4H4z',
+  },
+  {
+    title: 'Targets with pace',
+    body: 'Tuesday is judged against Tuesday, not against Friday. On pace, close or behind, in words as well as colour.',
+    icon: 'M12 20.5a8.5 8.5 0 1 0-8.5-8.5M12 12l5-4.5M12 12v4',
+  },
+  {
+    title: 'Compliance at a glance',
+    body: 'A month grid of who logged and who did not, with late kept separate from missing.',
+    icon: 'M4 6.5h16v14H4zM8 3v5M16 3v5M4 11h16M9 15.5l2 2 4-4',
+  },
+  {
+    title: 'Reminders that respect time zones',
+    body: 'Each person is nudged inside their own working day, once per thing, never twice.',
+    icon: 'M12 7v5.2l3.2 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z',
+  },
+  {
+    title: 'Everything exports',
+    body: 'A printable weekly report and a monthly CSV. The data is never trapped in here.',
+    icon: 'M12 3.5v11M8 11l4 4 4-4M4 19.5h16',
+  },
+];
 
-/** A month of the compliance grid. The pattern is illustrative, not anyone's real month. */
-function ComplianceShot() {
-  const people = [
-    { name: 'Tanzil', days: 'SSSLS·SSSSS·SMSSS·SS' },
-    { name: 'Anil', days: 'SSSSS·SSLSS·SSSSS·SS' },
-    { name: 'Tamre', days: 'SSLSS·SSSSM·SSSSS·SS' },
-  ];
+const STEPS = [
+  {
+    title: 'They log the day',
+    body: 'A short form per working day, a couple of minutes. Late still counts, and a missed day never blocks the next one.',
+  },
+  {
+    title: 'The week assembles itself',
+    body: 'Daily numbers roll into the weekly log, totals already filled in. Nobody is asked for the same figure twice.',
+  },
+  {
+    title: 'You read, you do not assemble',
+    body: 'The dashboard is live all week and the report lands on Monday at nine. Your job goes back to deciding things.',
+  },
+];
 
-  return (
-    <figure className="lp-card">
-      <figcaption>Did everyone log?</figcaption>
-      <div className="lp-grid-rows">
-        {people.map((person) => (
-          <div className="lp-grid-row" key={person.name}>
-            <span>{person.name}</span>
-            <div className="lp-cells">
-              {[...person.days].map((mark, index) =>
-                mark === '·' ? (
-                  <i className="lp-cell off" key={`${person.name}-${index}`} />
-                ) : (
-                  <i
-                    key={`${person.name}-${index}`}
-                    className={`lp-cell ${mark === 'S' ? 'sub' : mark === 'L' ? 'late' : 'miss'}`}
-                  />
-                ),
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="lp-legend">
-        <span>
-          <i className="lp-cell sub" /> Submitted
-        </span>
-        <span>
-          <i className="lp-cell late" /> Late
-        </span>
-        <span>
-          <i className="lp-cell miss" /> Missing
-        </span>
-      </div>
-    </figure>
-  );
-}
-
-/** This week against target, the way the dashboard draws it. */
-function PaceShot() {
-  const rows = [
-    { label: 'Emails sent', actual: 142, target: 150, share: 0.95, word: 'On pace' },
-    { label: 'Posts published', actual: 3, target: 5, share: 0.6, word: 'Behind' },
-    { label: 'Meetings booked', actual: 4, target: 3, share: 1, word: 'On pace' },
-    { label: 'Accounts added', actual: 18, target: 25, share: 0.72, word: 'Close' },
-  ];
-
-  return (
-    <figure className="lp-card">
-      <figcaption>This week against target</figcaption>
-      <div className="lp-pace">
-        {rows.map((row) => (
-          <div key={row.label}>
-            <div className="between small">
-              <span>{row.label}</span>
-              <span className="mono muted">
-                {row.actual} / {row.target} · {row.word}
-              </span>
-            </div>
-            <div className="bar">
-              <i
-                className={row.word === 'On pace' ? '' : 'behind'}
-                style={{ width: `${Math.round(row.share * 100)}%` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </figure>
-  );
-}
-
-/** The contributor's own card, which is the first thing they see. */
-function StreakShot() {
-  return (
-    <figure className="lp-card lp-card-tight">
-      <figcaption>Consistency</figcaption>
-      <div className="row" style={{ gap: 10 }}>
-        <span style={{ fontSize: 26 }} aria-hidden="true">
-          🔥
-        </span>
-        <span className="stat">12 days</span>
-      </div>
-      <div className="bar" style={{ marginTop: 10 }}>
-        <i style={{ width: '60%', background: 'var(--c4)' }} />
-      </div>
-      <p className="small muted" style={{ marginTop: 10 }}>
-        8 more days to reach 20.
-      </p>
-      <p className="xs mono muted">LOGGED TODAY · PERSONAL BEST</p>
-    </figure>
-  );
-}
+const POINTS = [
+  {
+    b: 'Consistency, not punctuality.',
+    p: 'A streak counts days logged, late or not. Leave and weekends are skipped, never broken.',
+  },
+  {
+    b: 'Nothing can be taken away.',
+    p: 'Badges are lifetime totals and personal bests, so a quiet fortnight never demotes anyone.',
+  },
+  {
+    b: 'A missed day is a nudge.',
+    p: 'It never locks today. The gap still shows to you, but it does not stop the work.',
+  },
+  {
+    b: 'An honest zero is welcome.',
+    p: 'Low numbers are safe to report, which is the only thing that keeps the data real.',
+  },
+];
