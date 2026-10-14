@@ -8,7 +8,7 @@ import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import { config } from './config.js';
-import { registerErrorHandler } from './errors.js';
+import { HttpError, registerErrorHandler } from './errors.js';
 import { registerSecurity } from './security.js';
 import { registerContext } from './context.js';
 import { authRoutes } from './auth/routes.js';
@@ -47,6 +47,20 @@ export async function buildApp(): Promise<FastifyInstance> {
   });
 
   await app.register(cookie, { secret: cfg.SESSION_SECRET });
+
+  /**
+   * Several routes take no body at all (submit, mark a notification read). A browser sends those
+   * as a POST with no content-type, which Fastify's parser rejects before the handler ever runs.
+   * An empty body on such a request is valid and means "nothing to say"; anything else with an
+   * unrecognised type is still refused.
+   */
+  app.addContentTypeParser('*', { parseAs: 'string' }, (_request, body, done) => {
+    if (body === '') {
+      done(null, {});
+      return;
+    }
+    done(new HttpError(415, { error: 'invalid', fields: { body: 'Unsupported content type' } }));
+  });
 
   await app.register(multipart, {
     limits: { fileSize: cfg.MAX_UPLOAD_BYTES, files: 1, fields: 10 },

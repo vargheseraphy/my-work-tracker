@@ -49,14 +49,19 @@ export function setSignedOutHandler(handler: () => void): void {
 }
 
 async function request<T>(method: Method, path: string, body?: unknown): Promise<T> {
+  // Every non-GET carries a JSON body, even when the route wants nothing. A POST with no
+  // content-type is rejected by Fastify's parser before the handler runs ("Unsupported Media
+  // Type"), which silently broke body-less calls such as submit and mark-as-read.
+  const sendsBody = method !== 'GET' && method !== 'DELETE';
+
   const response = await fetch(`/api${path}`, {
     method,
     credentials: 'same-origin',
     headers: {
       'X-Requested-With': 'gtm',
-      ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      ...(sendsBody ? { 'Content-Type': 'application/json' } : {}),
     },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: sendsBody ? JSON.stringify(body ?? {}) : undefined,
   });
 
   if (response.status === 204) return undefined as T;
