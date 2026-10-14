@@ -24,20 +24,20 @@ Differences from the prototypes, on purpose:
 - The "Prototype only: fill sample values" buttons and "Sample data" labels are not built.
 - The "Switch to manager view" link is not built; the menu follows the signed-in role.
 
-## Tokens (copy into apps/web/src/styles/tokens.css)
-```css
---bg:#F5F5F3; --surface:#FFFFFF; --surface-2:#FAFAF8; --border:#E4E4E0; --border-strong:#CFCFC9;
---text:#111111; --muted:#555555; --faint:#6E6E6E;
---gold:#D4A843; --gold-light:#F0C866;
---good:#2B6E45; --good-bg:#E7F2EB; --good-line:#B9DBC6;
---bad:#A83A28;  --bad-bg:#FBECE8;  --bad-line:#EDC2B8;
---warn:#7A5200; --warn-bg:#FFF3D6; --warn-line:#EBD49A;
---info:#34465A; --info-bg:#E9EEF3; --info-line:#C4D0DC;
---font:'Plus Jakarta Sans',system-ui,sans-serif; --mono:'DM Mono',ui-monospace,monospace;
-```
-Radius: 12 px cards, 9 px buttons, 8 px inputs, 5 px pills. Primary buttons are black (`--text`).
-Gold is only for the 3 px top bar, the active menu marker, eyebrow rules and progress bars:
-never text, never a fill behind text. Fonts load from Google Fonts; with no internet they fall back to system fonts.
+## Tokens
+
+The Repotra brand tokens live in `apps/web/src/styles/tokens.css` and are specified in
+`design/brand-theme/my-report-tracker-brand-manual.md`, which is the source of truth. Light and
+dark are both defined. Do not copy colour values into component CSS; read the token.
+
+Names follow the manual: `--ink`, `--ink-2`, `--muted` for text; `--accent` for the one main
+action and the focus ring; `--line` for hairlines; `--c1` to `--c6` for chart categories;
+`--orb-*` for background and glass only. The older names (`--text`, `--gold`, `--border`,
+`--radius`) still resolve as aliases so existing rules keep working, but do not add new uses.
+
+Radius: 4 px buttons, inputs and chips; 10 px cards; 14 px glass. Nothing is a pill, avatars
+only are round. Primary buttons are ink fill with canvas text. Accent appears once per view.
+Fonts load from Google Fonts; with no internet they fall back to Segoe UI and system faces.
 
 ## Components
 AppShell, Sidebar (role-aware, badges), PageHead (eyebrow + title + actions), Card, StatCard,

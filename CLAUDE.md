@@ -70,8 +70,11 @@ If two sources disagree, follow the higher one, write the conflict in docs/BLOCK
   contributor test logins go in docs/progress.md under "Local accounts".
 - Do not call external services except the npm registry. Email goes to Mailpit unless .env has
   real SMTP settings. Do not change .env SMTP settings yourself.
-- Copy: UK English, sentence case, no exclamation marks. Gold #D4A843 only for keylines and
-  markers, never text or fill on white.
+- Copy: UK English, sentence case, no exclamation marks. The app is Repotra; there is no Yallo
+  branding in the product.
+- Brand: design/brand-theme/ is the visual source of truth, and its tokens live in
+  apps/web/src/styles/tokens.css. Accent is one main action per view and the focus ring, never
+  text on white and never a chart colour. Orb hues are background and glass only, never text.
 - Accessibility: real buttons, inputs with labels, keyboard reachable, visible focus, 4.5:1
   contrast, status never by colour alone.
 - Do not run destructive commands outside this folder. Do not delete the database volume
