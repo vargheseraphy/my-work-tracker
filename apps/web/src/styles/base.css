@@ -117,12 +117,6 @@ textarea {
   font-weight: 800;
   letter-spacing: 0.04em;
 }
-.brand small {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--faint);
-}
 
 .nav {
   display: flex;

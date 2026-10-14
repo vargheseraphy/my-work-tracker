@@ -11,19 +11,16 @@ import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { NotificationBell } from './NotificationBell.jsx';
 
-const LOGO_PATHS = [
-  'M19.6,214.3c0-32.4,26.1-58.7,58.3-58.7h58.3v58.7c0,32.4-26.1,58.7-58.3,58.7s-58.3-26.3-58.3-58.7Z',
-  'M272.5,78.9c0,32.4-26.1,58.7-58.3,58.7h-58.3v-58.7c0-32.4,26.1-58.7,58.3-58.7s58.3,26.3,58.3,58.7Z',
-  'M19.6,78.9c0,32.4,26.1,58.7,58.3,58.7h58.3v-58.7c0-32.4-26.1-58.7-58.3-58.7s-58.3,26.3-58.3,58.7Z',
-  'M272.5,214.3c0-32.4-26.1-58.7-58.3-58.7h-58.3v58.7c0,32.4,26.1,58.7,58.3,58.7s58.3-26.3,58.3-58.7Z',
-];
-
-function Logo() {
+/**
+ * The Repotra mark: three rising bars, the activity-over-time idea the app is built around.
+ * Corners are tight (design/brand-theme) and the fills are tokens, so it follows light and dark.
+ */
+function Logo({ size = 22 }: { size?: number }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 300 300" aria-hidden="true">
-      {LOGO_PATHS.map((d) => (
-        <path key={d} fillRule="evenodd" fill="#D4A843" d={d} />
-      ))}
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="2" y="13" width="5" height="9" rx="1.5" fill="var(--orb-cyan)" />
+      <rect x="9.5" y="8" width="5" height="14" rx="1.5" fill="var(--orb-violet)" />
+      <rect x="17" y="3" width="5" height="19" rx="1.5" fill="var(--accent)" />
     </svg>
   );
 }
@@ -115,8 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="sidebar">
         <Link className="brand" to={user.role === 'contributor' ? '/' : '/admin'}>
           <Logo />
-          <b>Yallo</b>
-          <small>GTM</small>
+          <b>Repotra</b>
         </Link>
 
         <nav className="nav" aria-label="Main">

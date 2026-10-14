@@ -816,13 +816,6 @@
   font-weight: 800;
   letter-spacing: 0.04em;
 }
-.lockup .t small {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  color: var(--muted);
-  margin-top: 4px;
-}
 .signin .panel {
   display: flex;
   align-items: center;

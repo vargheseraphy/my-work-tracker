@@ -10,37 +10,28 @@ import { api, ApiProblem } from '../../api.js';
 import { useAuth } from '../../auth.jsx';
 import { Button, ErrorNote } from '../../components/ui.jsx';
 
-const LOGO_PATHS = [
-  'M19.6,214.3c0-32.4,26.1-58.7,58.3-58.7h58.3v58.7c0,32.4-26.1,58.7-58.3,58.7s-58.3-26.3-58.3-58.7Z',
-  'M272.5,78.9c0,32.4-26.1,58.7-58.3,58.7h-58.3v-58.7c0-32.4,26.1-58.7,58.3-58.7s58.3,26.3,58.3,58.7Z',
-  'M19.6,78.9c0,32.4,26.1,58.7,58.3,58.7h58.3v-58.7c0-32.4-26.1-58.7-58.3-58.7s-58.3,26.3-58.3,58.7Z',
-  'M272.5,214.3c0-32.4-26.1-58.7-58.3-58.7h-58.3v58.7c0,32.4,26.1,58.7,58.3,58.7s58.3-26.3,58.3-58.7Z',
-];
-
 function Frame({ children }: { children: ReactNode }) {
   return (
     <div className="signin">
       <section className="hero">
         <div className="lockup">
-          <svg width="34" height="34" viewBox="0 0 300 300" aria-hidden="true">
-            {LOGO_PATHS.map((d) => (
-              <path key={d} fillRule="evenodd" fill="#D4A843" d={d} />
-            ))}
+          <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="2" y="13" width="5" height="9" rx="1.5" fill="var(--orb-cyan)" />
+            <rect x="9.5" y="8" width="5" height="14" rx="1.5" fill="var(--orb-violet)" />
+            <rect x="17" y="3" width="5" height="19" rx="1.5" fill="var(--accent)" />
           </svg>
           <span className="t">
-            <b>Yallo</b>
-            <small>GROUP</small>
+            <b>Repotra</b>
           </span>
         </div>
         <div className="stack" style={{ gap: 18 }}>
-          <span className="eyebrow">GTM operating system</span>
+          <span className="eyebrow">Daily activity, weekly results</span>
           <h1>Log the day. Close the week. Keep the pipeline honest.</h1>
           <p className="muted" style={{ maxWidth: 440, fontSize: 16, lineHeight: 1.7 }}>
-            Daily activity, weekly results, ABM accounts and backlog tasks for the Yallo GTM team,
-            in one place.
+            Daily activity, weekly results, ABM accounts and backlog tasks for the whole team, in
+            one place.
           </p>
         </div>
-        <span className="mono xs faint">yallo.co</span>
       </section>
       <section className="panel">
         <div className="card box stack" style={{ gap: 22, padding: 36 }}>
@@ -78,7 +69,7 @@ export function SignIn() {
       <div className="stack" style={{ gap: 6 }}>
         <h2 style={{ fontSize: 24 }}>Sign in</h2>
         <p className="small muted">
-          Use your Yallo work account. Access is limited to the GTM team.
+          Use your work account. Access is limited to invited people.
         </p>
       </div>
 
@@ -245,7 +236,7 @@ export function SetPassword() {
   return (
     <ChoosePassword
       heading="Choose your password"
-      blurb="This sets the password for your Yallo GTM tracker account."
+      blurb="This sets the password for your Repotra account."
       purpose="invite"
     />
   );
