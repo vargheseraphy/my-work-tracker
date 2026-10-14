@@ -1,4 +1,10 @@
 /* The public landing page.
+
+   Rule learned the hard way: never hardcode a colour in here. A band can be switched between
+   light and dark at any time, and a fixed white card under dark-theme text tokens renders as
+   grey-on-white. Everything reads --surface, --bg, --band-from/to or --glass-edge so it follows
+   whichever palette its section carries.
+
    Dark bands carry .theme-dark, which re-declares the palette for that subtree only.
    Every animation here is decoration and is switched off under prefers-reduced-motion. */
 
@@ -52,14 +58,14 @@
 }
 /* A faintly tinted band, so sections alternate in weight rather than all being flat white. */
 .lp-band-tint {
-  background: linear-gradient(180deg, #fbfaff, var(--bg));
+  background: linear-gradient(180deg, var(--band-from), var(--bg));
 }
 .lp-product {
-  background: linear-gradient(180deg, var(--bg), #f6f4fd);
+  background: linear-gradient(180deg, var(--bg), var(--band-to));
   border-block: 1px solid var(--line);
 }
 .lp-steps {
-  background: linear-gradient(180deg, #f7f5fd, var(--bg));
+  background: linear-gradient(180deg, var(--band-to), var(--bg));
 }
 .lp-close {
   background:
@@ -68,7 +74,7 @@
       color-mix(in srgb, var(--orb-violet) 30%, transparent),
       transparent 70%
     ),
-    linear-gradient(180deg, var(--bg), #efecfb);
+    linear-gradient(180deg, var(--bg), var(--band-to));
   border-top: 1px solid var(--line);
 }
 
@@ -433,7 +439,7 @@
   color: var(--accent);
   border: 1.5px solid transparent;
   background:
-    linear-gradient(180deg, #fff, #f6f4fd) padding-box,
+    linear-gradient(180deg, var(--surface), var(--surface-2)) padding-box,
     conic-gradient(
         from 140deg,
         var(--orb-violet),
@@ -461,14 +467,14 @@
   flex-direction: column;
   gap: 12px;
   padding: 28px;
-  background: linear-gradient(180deg, #fff, #fcfbff);
+  background: linear-gradient(180deg, var(--surface), var(--bg));
   border: 1px solid var(--line);
   border-radius: var(--r-panel);
   /* Layered, low-opacity shadows read as depth; one hard shadow reads as a sticker. */
   box-shadow:
     0 1px 2px rgba(32, 24, 92, 0.05),
     0 8px 20px -10px rgba(32, 24, 92, 0.14),
-    inset 0 1px 0 #fff;
+    inset 0 1px 0 var(--glass-edge);
   transition:
     transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1),
     box-shadow 0.28s ease;
@@ -478,7 +484,7 @@
   box-shadow:
     0 2px 4px rgba(32, 24, 92, 0.06),
     0 26px 50px -18px rgba(32, 24, 92, 0.26),
-    inset 0 1px 0 #fff;
+    inset 0 1px 0 var(--glass-edge);
 }
 .lp-card h3 {
   font-size: 17px;
@@ -501,12 +507,12 @@
   gap: 12px;
   padding: 28px;
   border-radius: var(--r-panel);
-  background: linear-gradient(180deg, #fff, #fcfbff);
+  background: linear-gradient(180deg, var(--surface), var(--bg));
   border: 1px solid var(--line);
   box-shadow:
     0 1px 2px rgba(32, 24, 92, 0.05),
     0 8px 20px -12px rgba(32, 24, 92, 0.12),
-    inset 0 1px 0 #fff;
+    inset 0 1px 0 var(--glass-edge);
   transition:
     transform 0.28s cubic-bezier(0.2, 0.7, 0.3, 1),
     box-shadow 0.28s ease,
@@ -518,7 +524,7 @@
   box-shadow:
     0 2px 4px rgba(32, 24, 92, 0.06),
     0 26px 50px -18px rgba(32, 24, 92, 0.22),
-    inset 0 1px 0 #fff;
+    inset 0 1px 0 var(--glass-edge);
 }
 .lp-tile-wide {
   grid-column: 1 / -1;
@@ -600,12 +606,12 @@
   margin: 0;
   padding: 22px;
   border-radius: var(--r-panel);
-  background: linear-gradient(180deg, #fff, #fcfbff);
+  background: linear-gradient(180deg, var(--surface), var(--bg));
   border: 1px solid var(--line);
   box-shadow:
     0 1px 2px rgba(32, 24, 92, 0.05),
     0 18px 40px -20px rgba(32, 24, 92, 0.24),
-    inset 0 1px 0 #fff;
+    inset 0 1px 0 var(--glass-edge);
 }
 /* Offset, so the pair reads as two objects at different depths rather than a list. */
 .lp-mini + .lp-mini {
@@ -1085,7 +1091,7 @@
     0 30px 60px -28px rgba(32, 24, 92, 0.3);
 }
 .lp-answers article {
-  background: linear-gradient(180deg, #fff, #fcfbff);
+  background: linear-gradient(180deg, var(--surface), var(--bg));
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
