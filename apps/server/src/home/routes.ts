@@ -4,7 +4,7 @@
  */
 
 import type { FastifyInstance } from 'fastify';
-import { weekMonday, type HomeDto, type TargetProgressDto } from '@gtm/shared';
+import { weekMonday, type HomeDto, type StreakDto, type TargetProgressDto } from '@gtm/shared';
 import { many, one, withUser } from '../db.js';
 import { requireUser } from '../context.js';
 import { backfillDays, localToday, missingDays } from '../entries/service.js';
@@ -66,7 +66,7 @@ export async function homeRoutes(app: FastifyInstance): Promise<void> {
         weeklyStatus: (weeklyEntry?.status as HomeDto['weeklyStatus']) ?? 'missing',
         weeklyIsOpen: weeklyOpen?.isOpen ?? false,
         abmThisWeek: owned.find((a) => a.plannedWeek === monday) ?? null,
-        streak: await countStreak(client, user.id, today),
+        streak: await countStreak(client, user.id),
       };
     });
   });
@@ -113,28 +113,36 @@ export async function countWeekDays(
   return { done: row?.done ?? 0, total: row?.total ?? 5 };
 }
 
-/** Consecutive working days signed off, counting back from the last finished working day. */
+/** Milestones worth celebrating, in working days. Reachable, then satisfying, then rare. */
+export const STREAK_MILESTONES = [3, 5, 10, 20, 40, 60, 100] as const;
+
+/**
+ * The run itself is counted by contributor_streak() in the database (db/migrations/0008), not
+ * here: it is a rule about the business, and rules live in SQL where row-level security applies.
+ */
 async function countStreak(
   client: Parameters<typeof many>[0],
   userId: string,
-  today: string,
-): Promise<number> {
-  const days = await many<{ d: string; submitted: boolean }>(
+): Promise<StreakDto> {
+  const row = await one<{
+    current: number;
+    best: number;
+    loggedToday: boolean;
+    lastLogged: string | null;
+  }>(
     client,
-    `select d, exists (select 1 from entries e
-                        where e.user_id = $1 and e.log_type = 'daily' and e.period_start = d
-                          and e.status in ('submitted', 'late')) as submitted
-       from working_days_between($1, $2::date - 90, $2::date) d
-      order by d desc`,
-    [userId, today],
+    `select current_streak as "current", best_streak as "best",
+            logged_today as "loggedToday", last_logged as "lastLogged"
+       from contributor_streak($1)`,
+    [userId],
   );
 
-  let streak = 0;
-  for (const day of days) {
-    // Today does not break a streak until its deadline has passed.
-    if (day.d === today && !day.submitted) continue;
-    if (!day.submitted) break;
-    streak += 1;
-  }
-  return streak;
+  const current = row?.current ?? 0;
+  return {
+    current,
+    best: row?.best ?? 0,
+    loggedToday: row?.loggedToday ?? false,
+    lastLogged: row?.lastLogged ?? null,
+    nextMilestone: STREAK_MILESTONES.find((m) => m > current) ?? null,
+  };
 }

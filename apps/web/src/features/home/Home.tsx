@@ -27,6 +27,7 @@ import {
   Segmented,
   StatCard,
 } from '../../components/ui.jsx';
+import { StreakCard } from './StreakCard.jsx';
 
 const STATUS_WORD: Record<string, string> = {
   missing: 'Not started',
@@ -105,15 +106,7 @@ export function Home() {
             </LinkButton>
           }
         />
-        <StatCard
-          kicker="Logging streak"
-          stat={`${data.streak} ${data.streak === 1 ? 'day' : 'days'}`}
-          note={
-            data.streak === 0
-              ? 'Submit today to start one.'
-              : 'Working days signed off in a row.'
-          }
-        />
+        <StreakCard streak={data.streak} />
         <StatCard
           kicker="Weekly log"
           stat={

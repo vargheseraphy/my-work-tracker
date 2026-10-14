@@ -222,7 +222,21 @@ export interface HomeDto {
   weeklyStatus: EntryStatus | 'missing';
   weeklyIsOpen: boolean;
   abmThisWeek: AbmAccountDto | null;
-  streak: number;
+  streak: StreakDto;
+}
+
+/**
+ * Consistency, counted in working days. Built to encourage: a day counts whether it was on time
+ * or late, non-working days and leave are skipped rather than breaking the run, and today still
+ * being open never costs you the streak.
+ */
+export interface StreakDto {
+  current: number;
+  best: number;
+  loggedToday: boolean;
+  lastLogged: IsoDate | null;
+  /** The next milestone worth reaching, or null once every milestone is passed. */
+  nextMilestone: number | null;
 }
 
 export interface ComplianceCellDto {

@@ -865,3 +865,53 @@
     font-size: 32px;
   }
 }
+
+/* ---------- consistency streak (contributor home) ---------- */
+.streak-card {
+  gap: 10px;
+}
+.streak-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* Decoration only. The card always states the run in words as well. */
+.flame-lit {
+  color: var(--c4);
+}
+.flame-warm {
+  color: #e8720c;
+}
+.flame-hot {
+  color: var(--bad);
+}
+.streak-bar {
+  height: 6px;
+}
+.streak-bar > i {
+  background: var(--c4);
+}
+.streak-foot {
+  margin: 0;
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* A flame that has just been earned gives one small nudge, never a loop. */
+@media (prefers-reduced-motion: no-preference) {
+  .streak-head .flame {
+    animation: flame-in 420ms ease-out;
+  }
+}
+@keyframes flame-in {
+  from {
+    transform: scale(0.7) translateY(3px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
