@@ -1,0 +1,410 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>My Report &amp; Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: bright orb-lit band carrying frosted KPI glass, then crisp white work cards on a cool canvas. Corners kept tight. */
+:root{
+  --bg:#F5F4FA; --surface:#FFFFFF; --surface-2:#EFEDF7; --line:#D5D8E3;
+  --ink:#0B1424; --ink-2:#1B2A44; --muted:#34415A;
+  --accent:#4B3FD1; --accent-ink:#FFFFFF; --link:#0052A3;
+  --good:#0A6B34; --warn:#8A4200; --bad:#A61D12;
+  --good-bg:#E3F5EA; --warn-bg:#FFF0DD; --bad-bg:#FDE6E3;
+  --c1:#4B3FD1; --c2:#0B74B8; --c3:#08806F; --c4:#B86A00; --c5:#B5287A; --c6:#4D5872;
+  --orb-violet:#A493FF; --orb-cyan:#6FD3FF; --orb-peach:#FFBE98; --orb-pink:#F59AD9;
+  --band-from:#FFFFFF; --band-to:#ECE8FF;
+  --glass:rgba(255,255,255,.58); --glass-edge:rgba(255,255,255,.95); --glass-sheen:rgba(255,255,255,.75);
+  --shadow:0 1px 2px rgba(11,20,36,.10),0 2px 6px rgba(11,20,36,.08);
+  --shadow-lg:0 10px 30px rgba(43,32,140,.16);
+  --r-btn:4px; --r-card:10px; --r-panel:14px;
+  --font:"Segoe UI Variable Text","Segoe UI","Noto Sans","Helvetica Neue",Arial,sans-serif;
+  --font-display:"Segoe UI Variable Display","Segoe UI","Noto Sans","Helvetica Neue",Arial,sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#070B16; --surface:#0F1626; --surface-2:#17213A; --line:#2B3756;
+  --ink:#F5F7FC; --ink-2:#E0E6F2; --muted:#C3CCDD;
+  --accent:#A79DFF; --accent-ink:#0B1424; --link:#8CC6FF;
+  --good:#6BDCA2; --warn:#FFBE70; --bad:#FF9A8C;
+  --good-bg:#0F3324; --warn-bg:#3A2610; --bad-bg:#3D1713;
+  --c1:#A79DFF; --c2:#5CC3FF; --c3:#3FD6C0; --c4:#FFB547; --c5:#FF86C8; --c6:#AEB9D0;
+  --orb-violet:#5B45E8; --orb-cyan:#0E86C2; --orb-peach:#C2643C; --orb-pink:#B03A92;
+  --band-from:#0A1020; --band-to:#17123A;
+  --glass:rgba(20,30,56,.50); --glass-edge:rgba(255,255,255,.22); --glass-sheen:rgba(255,255,255,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.4); --shadow-lg:0 12px 34px rgba(0,0,0,.55);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#070B16; --surface:#0F1626; --surface-2:#17213A; --line:#2B3756;
+  --ink:#F5F7FC; --ink-2:#E0E6F2; --muted:#C3CCDD;
+  --accent:#A79DFF; --accent-ink:#0B1424; --link:#8CC6FF;
+  --good:#6BDCA2; --warn:#FFBE70; --bad:#FF9A8C;
+  --good-bg:#0F3324; --warn-bg:#3A2610; --bad-bg:#3D1713;
+  --c1:#A79DFF; --c2:#5CC3FF; --c3:#3FD6C0; --c4:#FFB547; --c5:#FF86C8; --c6:#AEB9D0;
+  --orb-violet:#5B45E8; --orb-cyan:#0E86C2; --orb-peach:#C2643C; --orb-pink:#B03A92;
+  --band-from:#0A1020; --band-to:#17123A;
+  --glass:rgba(20,30,56,.50); --glass-edge:rgba(255,255,255,.22); --glass-sheen:rgba(255,255,255,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.4); --shadow-lg:0 12px 34px rgba(0,0,0,.55);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.55 var(--font);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--link)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* Buttons and controls */
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 14px/1 var(--font);padding:10px 16px;border-radius:var(--r-btn);border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.15)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.sm{padding:7px 11px;font-size:13px}
+.btn.accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-btn);padding:6px 9px;cursor:pointer;font:600 12px var(--font)}
+.iconbtn:hover{border-color:var(--bad);color:var(--bad)}
+label{font-size:13px;font-weight:600;color:var(--ink-2);display:grid;gap:6px}
+input,select,textarea{font:400 15px var(--font);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-btn);padding:9px 11px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+
+/* Header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:20px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font:700 17px var(--font-display);color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+.mark{width:26px;height:26px;border-radius:6px;background:conic-gradient(from 200deg,var(--orb-violet),var(--orb-cyan),var(--orb-peach),var(--orb-pink),var(--orb-violet));box-shadow:inset 0 0 0 1px var(--glass-edge)}
+nav.main{display:flex;gap:4px}
+nav.main a{color:var(--ink);text-decoration:none;font-weight:600;font-size:14px;padding:8px 12px;border-radius:var(--r-btn)}
+nav.main a:hover{background:var(--surface-2)}
+.bar .end{margin-left:auto;display:flex;gap:8px;align-items:center}
+.theme{display:flex;border:1.5px solid var(--line);border-radius:var(--r-btn);overflow:hidden}
+.theme button{border:0;background:transparent;color:var(--ink);font:600 12px var(--font);padding:7px 10px;cursor:pointer}
+.theme button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+@media (max-width:860px){nav.main{display:none}}
+@media (max-width:520px){.theme{display:none}}
+
+/* Band */
+.band{position:relative;overflow:hidden;background:linear-gradient(165deg,var(--band-from) 10%,var(--band-to))}
+.orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(2px)}
+.orb::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.95) 0 4%,rgba(255,255,255,.4) 12%,transparent 30%)}
+.o1{width:460px;height:460px;left:-120px;top:60px;background:radial-gradient(circle at 60% 65%,var(--orb-violet),color-mix(in srgb,var(--orb-violet) 30%,transparent) 62%,transparent 71%)}
+.o2{width:380px;height:380px;right:-90px;top:-110px;background:radial-gradient(circle at 55% 60%,var(--orb-cyan),color-mix(in srgb,var(--orb-cyan) 30%,transparent) 60%,transparent 71%)}
+.o3{width:220px;height:220px;right:30%;bottom:-90px;background:radial-gradient(circle at 55% 55%,var(--orb-peach),color-mix(in srgb,var(--orb-pink) 40%,transparent) 60%,transparent 71%)}
+.band .wrap{position:relative;padding-block:36px 36px;display:grid;gap:24px}
+.head{display:flex;flex-wrap:wrap;gap:16px;align-items:end;justify-content:space-between}
+.eyebrow{font:500 12px var(--font-data);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+h1{font:700 clamp(28px,3.6vw,40px)/1.15 var(--font-display);letter-spacing:-.015em;margin-top:6px}
+.seg{display:inline-flex;padding:4px;gap:4px;background:var(--glass);border:1px solid var(--glass-edge);border-radius:8px;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:var(--shadow-lg)}
+.seg button{border:0;background:transparent;color:var(--ink);font:600 14px var(--font);padding:9px 16px;border-radius:5px;cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+@media (max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:680px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:400px){.kpis{grid-template-columns:1fr}}
+.glass{position:relative;background:linear-gradient(140deg,var(--glass-sheen),transparent 45%),var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-panel);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);box-shadow:var(--shadow-lg),inset 0 1px 0 var(--glass-edge)}
+.kpi{padding:16px 18px;display:grid;gap:6px;min-width:0}
+.kpi .lab{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.kpi .dot{width:9px;height:9px;border-radius:2px}
+.kpi .val{font:700 30px/1.1 var(--font-display);font-variant-numeric:tabular-nums}
+.kpi .val small{font:600 14px var(--font);color:var(--ink-2)}
+.prog{height:6px;border-radius:3px;background:color-mix(in srgb,var(--ink) 12%,transparent);overflow:hidden}
+.prog i{display:block;height:100%;border-radius:inherit}
+.kpi .note{font-size:12.5px;font-weight:600}
+
+/* Body */
+main .wrap{padding-block:28px 56px;display:grid;gap:20px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.span8{grid-column:span 8}.span4{grid-column:span 4}.span6{grid-column:span 6}.span12{grid-column:span 12}
+@media (max-width:980px){.span8,.span4,.span6{grid-column:span 12}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:20px;min-width:0}
+.card-h{display:flex;flex-wrap:wrap;gap:10px;align-items:start;justify-content:space-between;margin-bottom:14px}
+.card h2{font:700 18px/1.3 var(--font-display)}
+.card .hint{font-size:13.5px;color:var(--muted);margin:2px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+svg.chart{width:100%;height:auto;display:block}
+svg.chart text{fill:var(--muted);font:500 11px var(--font-data)}
+svg.chart .gl{stroke:var(--line)}
+
+.stages{display:grid;gap:12px}
+.stage{display:grid;grid-template-columns:120px 1fr 42px;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.stage .track{height:22px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.stage .track i{display:block;height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:4px}
+.stage b{text-align:right;font-variant-numeric:tabular-nums}
+
+.outcomes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.oc{border-radius:8px;padding:12px;display:grid;gap:2px;font-weight:600;font-size:13px}
+.oc b{font:700 24px var(--font-display);font-variant-numeric:tabular-nums}
+.oc.good{background:var(--good-bg);color:var(--good)}.oc.warn{background:var(--warn-bg);color:var(--warn)}
+.oc.neutral{background:var(--surface-2);color:var(--ink-2)}.oc.bad{background:var(--bad-bg);color:var(--bad)}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools input,.tools select{width:auto;min-width:0;padding:7px 10px;font-size:14px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+th{text-align:left;font:600 12px var(--font);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);padding:10px 12px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink)}
+tr:last-child td{border-bottom:0}
+td.notes{color:var(--muted);max-width:280px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px}
+.tag i{width:8px;height:8px;border-radius:2px}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:4px}
+.chip.good{background:var(--good-bg);color:var(--good)}.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.neutral{background:var(--surface-2);color:var(--ink-2)}.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.ex{font:500 10.5px var(--font-data);text-transform:uppercase;letter-spacing:.06em;border:1px solid var(--line);color:var(--muted);padding:1px 5px;border-radius:3px;margin-left:6px}
+.empty{padding:28px;text-align:center;color:var(--ink-2)}
+.status{font-size:13px;font-weight:600;color:var(--ink-2)}
+
+/* Log form */
+.form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.form .wide{grid-column:span 2}
+.form .full{grid-column:1/-1}
+@media (max-width:760px){.form{grid-template-columns:1fr 1fr}.form .wide{grid-column:1/-1}}
+@media (max-width:420px){.form{grid-template-columns:1fr}}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+.targets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:520px){.targets{grid-template-columns:1fr 1fr}}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);font-weight:600;padding:10px 16px;border-radius:6px;box-shadow:var(--shadow-lg);z-index:50}
+.report{white-space:pre-wrap;font:500 13px/1.6 var(--font-data);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:14px;margin:0;color:var(--ink);max-height:280px;overflow:auto}
+@media (prefers-reduced-motion:no-preference){.o1{animation:drift 20s ease-in-out infinite alternate}.o2{animation:drift 24s ease-in-out infinite alternate-reverse}}
+@keyframes drift{to{transform:translate(28px,-18px)}}
+</style>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span>My Report &amp; Tracker</a>
+    <nav class="main" aria-label="Sections"><a href="#log">Log activity</a><a href="#trend">Trend</a><a href="#pipeline">Pipeline</a><a href="#history">History</a><a href="#report">Daily report</a></nav>
+    <div class="end">
+      <div class="theme" role="group" aria-label="Theme">
+        <button id="th-light" data-t="light">Light</button><button id="th-dark" data-t="dark">Dark</button><button id="th-auto" data-t="">Auto</button>
+      </div>
+      <a class="btn accent" href="#log">+ Log activity</a>
+    </div>
+  </div>
+</header>
+
+<section class="band" id="top">
+  <div class="orb o1" aria-hidden="true"></div><div class="orb o2" aria-hidden="true"></div><div class="orb o3" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="head">
+      <div><div class="eyebrow" id="today-label">GTM daily activity</div><h1 id="greet">Today's GTM activity against target</h1></div>
+      <div class="seg" role="tablist" aria-label="Period">
+        <button role="tab" id="r-day" data-r="day" aria-selected="true">Today</button>
+        <button role="tab" id="r-week" data-r="week" aria-selected="false">Last 7 days</button>
+        <button role="tab" id="r-month" data-r="month" aria-selected="false">This month</button>
+      </div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <section class="card" id="log">
+      <div class="card-h"><div><h2>Log activity</h2><p class="hint">Record each call, email, LinkedIn touch, meeting, proposal or event as it happens.</p></div><span class="status" id="store-status">Connecting to your saved log…</span></div>
+      <form id="f" class="form" autocomplete="off">
+        <label>Date<input type="date" id="f-date" required></label>
+        <label>Activity<select id="f-type"></select></label>
+        <label>Stage<select id="f-stage"></select></label>
+        <label>Outcome<select id="f-outcome"></select></label>
+        <label class="wide">Account<input id="f-account" placeholder="Company name" required></label>
+        <label>Contact<input id="f-contact" placeholder="Name, role"></label>
+        <label>Owner<input id="f-owner" placeholder="Who did it"></label>
+        <label>Count<input type="number" id="f-count" min="1" max="500" value="1"></label>
+        <label>Pipeline value (₹)<input type="number" id="f-value" min="0" step="1000" placeholder="0"></label>
+        <label class="wide">Next step<input id="f-next" placeholder="e.g. Send proposal by Friday"></label>
+        <label class="full">Notes<textarea id="f-notes" rows="2" placeholder="What happened, objections, follow-ups"></textarea></label>
+        <div class="form-actions full"><button type="reset" class="btn ghost">Clear</button><button type="submit" class="btn">Save activity</button></div>
+      </form>
+    </section>
+
+    <div class="grid">
+      <section class="card span8" id="trend">
+        <div class="card-h"><div><h2>Activity, last 14 days</h2><p class="hint">Touches per day by activity type</p></div><div class="legend" id="legend"></div></div>
+        <svg class="chart" id="chart" viewBox="0 0 720 280" role="img" aria-label="Stacked bar chart of daily activity for the last 14 days"></svg>
+      </section>
+      <section class="card span4" id="pipeline">
+        <div class="card-h"><div><h2>Pipeline by stage</h2><p class="hint" id="pipe-hint">Accounts touched in the selected period</p></div></div>
+        <div class="stages" id="stages"></div>
+        <div class="outcomes" id="outcomes"></div>
+      </section>
+    </div>
+
+    <section class="card" id="history">
+      <div class="card-h">
+        <div><h2>Activity history</h2><p class="hint" id="hist-hint">Newest first</p></div>
+        <div class="tools">
+          <input id="q" type="search" placeholder="Search account, contact, notes" aria-label="Search">
+          <select id="ft" aria-label="Filter by activity"></select>
+          <button class="btn ghost sm" id="clear-ex" hidden>Remove example rows</button>
+        </div>
+      </div>
+      <div class="tbl"><table>
+        <thead><tr><th>Date</th><th>Activity</th><th>Account</th><th>Contact</th><th>Stage</th><th>Outcome</th><th class="num">Value</th><th>Next step</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+    </section>
+
+    <div class="grid">
+      <section class="card span6" id="report">
+        <div class="card-h"><div><h2>Daily report</h2><p class="hint">A ready-to-paste summary for your stand-up or manager</p></div><button class="btn sm" id="copy">Copy report</button></div>
+        <pre class="report" id="report-text"></pre>
+      </section>
+      <section class="card span6">
+        <div class="card-h"><div><h2>Daily targets</h2><p class="hint">Per working day. Weekly and monthly targets scale from these.</p></div><button class="btn sm ghost" id="save-t">Save targets</button></div>
+        <div class="targets" id="targets"></div>
+      </section>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+const TYPES=[["Call","--c1"],["Email","--c2"],["LinkedIn","--c3"],["Meeting","--c4"],["Proposal","--c5"],["Event","--c6"]];
+const STAGES=["Prospect","Engaged","Meeting booked","Proposal sent","Won","Lost"];
+const OUTCOMES=[["Positive","good"],["Neutral","neutral"],["No reply","warn"],["Negative","bad"]];
+const DEFAULT_TARGETS={Call:40,Email:60,LinkedIn:30,Meeting:3,Proposal:1,Event:0};
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const today=()=>iso(new Date());
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const inr=n=>"₹"+Math.round(n||0).toLocaleString("en-IN");
+const colorOf=t=>`var(${(TYPES.find(x=>x[0]===t)||TYPES[5])[1]})`;
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+let rows=[], targets={...DEFAULT_TARGETS}, range="day", mode="local", db=null;
+
+/* Theme */
+function setTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme");
+  document.querySelectorAll(".theme button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));ls.set("mrt.theme",t)}
+document.querySelectorAll(".theme button").forEach(b=>b.onclick=()=>setTheme(b.dataset.t));
+setTheme(ls.get("mrt.theme")||"");
+
+/* Form setup */
+const opt=(arr)=>arr.map(v=>`<option>${esc(Array.isArray(v)?v[0]:v)}</option>`).join("");
+$("f-type").innerHTML=opt(TYPES);$("f-stage").innerHTML=opt(STAGES);$("f-outcome").innerHTML=opt(OUTCOMES);
+$("ft").innerHTML='<option value="">All activities</option>'+opt(TYPES);
+$("f-date").value=today();$("f-owner").value=ls.get("mrt.owner")||"";
+$("legend").innerHTML=TYPES.map(([t,c])=>`<span><i style="background:var(${c})"></i>${t}</span>`).join("");
+
+/* Period helpers */
+function periodDates(r){const end=new Date();const out=[];
+  if(r==="day")return[iso(end)];
+  if(r==="week"){for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);out.push(iso(d))}return out}
+  const d=new Date(end.getFullYear(),end.getMonth(),1);while(d<=end){out.push(iso(d));d.setDate(d.getDate()+1)}return out}
+const workdays=ds=>Math.max(1,ds.filter(s=>{const w=parse(s).getDay();return w!==0&&w!==6}).length);
+
+/* Render */
+function render(){
+  const ds=periodDates(range), set=new Set(ds), inP=rows.filter(r=>set.has(r.date));
+  const now=new Date();
+  $("today-label").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  $("greet").textContent=range==="day"?"Today's GTM activity against target":range==="week"?"Last 7 days of GTM activity":"GTM activity this month";
+  const wd=workdays(ds);
+  const sum=t=>inP.filter(r=>r.type===t).reduce((a,r)=>a+(+r.count||1),0);
+  const tiles=["Call","Email","LinkedIn","Meeting"].map(t=>{const v=sum(t),tg=(targets[t]||0)*wd,pct=tg?Math.min(100,Math.round(v/tg*100)):0;
+    const note=!tg?"No target set":v>=tg?`<span style="color:var(--good)">Target met</span>`:`<span style="color:${pct>=60?"var(--ink-2)":"var(--warn)"}">${tg-v} to go · ${pct}%</span>`;
+    return `<div class="glass kpi"><span class="lab"><i class="dot" style="background:${colorOf(t)}"></i>${t==="LinkedIn"?"LinkedIn touches":t+"s"}</span><span class="val">${v}<small> / ${tg}</small></span><div class="prog"><i style="width:${pct}%;background:${colorOf(t)}"></i></div><span class="note">${note}</span></div>`});
+  const val=inP.reduce((a,r)=>a+(+r.value||0),0);
+  tiles.push(`<div class="glass kpi"><span class="lab"><i class="dot" style="background:var(--c5)"></i>Pipeline added</span><span class="val">${inr(val)}</span><div class="prog"><i style="width:100%;background:linear-gradient(90deg,var(--c1),var(--c5))"></i></div><span class="note">${new Set(inP.map(r=>r.account.toLowerCase())).size} accounts touched</span></div>`);
+  $("kpis").innerHTML=tiles.join("");
+  renderChart();renderPipeline(inP);renderTable();renderReport();
+}
+
+function renderChart(){
+  const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(iso(d))}
+  const by=days.map(d=>TYPES.map(([t])=>rows.filter(r=>r.date===d&&r.type===t).reduce((a,r)=>a+(+r.count||1),0)));
+  const tot=by.map(a=>a.reduce((x,y)=>x+y,0));
+  const raw=Math.max(10,...tot), step=[2,5,10,20,25,50,100,200,250,500,1000,2000,5000].find(s=>raw/s<=5)||10000, max=Math.ceil(raw/step)*step;
+  const W=720,H=280,L=40,R=8,T=12,B=34,cw=(W-L-R)/days.length,bw=Math.min(30,cw*.62);
+  const y=v=>T+(1-v/max)*(H-T-B);
+  let s="";for(let v=0;v<=max;v+=step)s+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+  days.forEach((d,i)=>{let acc=0;const x=L+i*cw+(cw-bw)/2;
+    TYPES.forEach(([t,c],k)=>{const v=by[i][k];if(!v)return;const y1=y(acc+v),h=y(acc)-y1;s+=`<rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(h-1,1)}" fill="var(${c})" rx="2"><title>${t}: ${v}</title></rect>`;acc+=v});
+    const dt=parse(d);if(i%2===1||i===13)s+=`<text x="${x+bw/2}" y="${H-12}" text-anchor="middle"${i===13?' style="fill:var(--ink);font-weight:600"':""}>${i===13?"Today":dt.getDate()+" "+dt.toLocaleDateString("en-GB",{month:"short"})}</text>`;
+    if(i===13&&tot[i])s+=`<text x="${x+bw/2}" y="${y(tot[i])-6}" text-anchor="middle" style="fill:var(--ink);font-weight:600">${tot[i]}</text>`});
+  $("chart").innerHTML=s;
+}
+
+function renderPipeline(inP){
+  const latest={};inP.slice().sort((a,b)=>(a.date+(a.createdAt||"")).localeCompare(b.date+(b.createdAt||""))).forEach(r=>latest[r.account.toLowerCase()]=r.stage);
+  const counts=STAGES.map(s=>Object.values(latest).filter(v=>v===s).length),mx=Math.max(1,...counts);
+  $("stages").innerHTML=STAGES.map((s,i)=>`<div class="stage"><span>${s}</span><div class="track"><i style="width:${counts[i]/mx*100}%;${s==="Lost"?"background:var(--bad)":s==="Won"?"background:var(--good)":""}"></i></div><b>${counts[i]}</b></div>`).join("");
+  $("outcomes").innerHTML=OUTCOMES.map(([o,c])=>`<div class="oc ${c}">${o}<b>${inP.filter(r=>r.outcome===o).length}</b></div>`).join("");
+  $("pipe-hint").textContent=`Latest stage per account, ${range==="day"?"today":range==="week"?"last 7 days":"this month"}`;
+}
+
+function renderTable(){
+  const q=$("q").value.trim().toLowerCase(),ft=$("ft").value;
+  const list=rows.filter(r=>(!ft||r.type===ft)&&(!q||[r.account,r.contact,r.notes,r.next,r.owner].join(" ").toLowerCase().includes(q)))
+    .sort((a,b)=>(b.date+(b.createdAt||"")).localeCompare(a.date+(a.createdAt||"")));
+  $("hist-hint").textContent=`${list.length} of ${rows.length} entries, newest first`;
+  $("clear-ex").hidden=!rows.some(r=>r.example);
+  if(!rows.length){$("rows").innerHTML=`<tr><td colspan="9" class="empty">No activity logged yet. Use <b>Log activity</b> above to add your first call, email or meeting.</td></tr>`;return}
+  $("rows").innerHTML=list.slice(0,300).map(r=>{const oc=(OUTCOMES.find(o=>o[0]===r.outcome)||OUTCOMES[1])[1];const dt=parse(r.date);
+    return `<tr><td class="num">${dt.getDate()} ${dt.toLocaleDateString("en-GB",{month:"short"})}${r.example?'<span class="ex">Example</span>':""}</td>
+    <td><span class="tag"><i style="background:${colorOf(r.type)}"></i>${esc(r.type)}${(+r.count||1)>1?` ×${r.count}`:""}</span></td>
+    <td><b>${esc(r.account)}</b>${r.owner?`<div class="hint" style="font-size:12.5px;color:var(--muted)">by ${esc(r.owner)}</div>`:""}</td>
+    <td>${esc(r.contact)}</td><td>${esc(r.stage)}</td><td><span class="chip ${oc}">${esc(r.outcome)}</span></td>
+    <td class="num">${r.value?inr(r.value):"–"}</td><td class="notes">${esc(r.next)}${r.notes?`<div>${esc(r.notes)}</div>`:""}</td>
+    <td><button class="iconbtn" data-del="${esc(r.id)}" aria-label="Delete entry">Delete</button></td></tr>`}).join("");
+}
+
+function renderReport(){
+  const d=today(),tr=rows.filter(r=>r.date===d);
+  const lines=[`GTM daily report, ${new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})}`,""];
+  TYPES.forEach(([t])=>{const v=tr.filter(r=>r.type===t).reduce((a,r)=>a+(+r.count||1),0),tg=targets[t]||0;if(v||tg)lines.push(`${(t+":").padEnd(10)} ${String(v).padStart(3)} of ${tg}`)});
+  lines.push("",`Pipeline added: ${inr(tr.reduce((a,r)=>a+(+r.value||0),0))}`);
+  const wins=tr.filter(r=>r.outcome==="Positive");if(wins.length){lines.push("","Positive conversations:");wins.slice(0,8).forEach(r=>lines.push(`- ${r.account}${r.contact?" ("+r.contact+")":""}: ${r.next||r.stage}`))}
+  const nx=tr.filter(r=>r.next&&r.outcome!=="Positive");if(nx.length){lines.push("","Next steps:");nx.slice(0,8).forEach(r=>lines.push(`- ${r.account}: ${r.next}`))}
+  if(!tr.length)lines.push("","Nothing logged yet today.");
+  $("report-text").textContent=lines.join("\n");
+}
+
+function renderTargets(){$("targets").innerHTML=TYPES.map(([t])=>`<label>${t}s per day<input type="number" min="0" max="999" id="t-${t}" value="${targets[t]??0}"></label>`).join("")}
+
+function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2600)}
+
+/* Store */
+const EXAMPLES=(()=>{const mk=(o,ac,t,st,oc,ct,val,nx,c)=>{const d=new Date();d.setDate(d.getDate()-o);return{date:iso(d),type:t,account:ac,stage:st,outcome:oc,contact:ct,value:val||0,next:nx||"",count:c||1,owner:"You",notes:"",example:true}};
+  return[mk(0,"Northwind Logistics","Call","Engaged","Positive","Meera Iyer, Head of Ops",0,"Demo on Friday",12),mk(0,"Bluepeak Retail","Email","Prospect","No reply","",0,"Follow up Monday",25),mk(0,"Kestrel Health","Meeting","Meeting booked","Positive","Dr Arjun Rao, COO",850000,"Send proposal",1),mk(0,"Various","LinkedIn","Prospect","Neutral","",0,"",14),
+  mk(1,"Orbit Fintech","Proposal","Proposal sent","Positive","Sana Qureshi, CFO",1200000,"Pricing call Thursday",1),mk(1,"Various","Call","Prospect","Neutral","",0,"",34),mk(1,"Various","Email","Prospect","No reply","",0,"",48),
+  mk(2,"Lumio Foods","Meeting","Meeting booked","Neutral","Karan Shah, VP Sales",400000,"Share case study",1),mk(2,"Various","Call","Prospect","Neutral","",0,"",29),mk(2,"Various","LinkedIn","Engaged","Positive","",0,"",22),
+  mk(3,"Various","Email","Prospect","No reply","",0,"",55),mk(3,"Halden Steel","Call","Lost","Negative","Procurement",0,"Revisit in Q1",1),mk(5,"Various","Call","Prospect","Neutral","",0,"",38),mk(6,"Various","Email","Prospect","Neutral","",0,"",61)]})();
+
+async function boot(){
+  let ns=null;
+  if(window.claude&&typeof window.claude.use==="function"){try{ns=await window.claude.use("db")}catch(e){ns=null}}
+  if(ns){db=ns;mode="db";$("store-status").textContent="Saved to your tracker. Synced across devices.";
+    db.collection("activities").orderBy("date","desc").limit(1000).onSnapshot(s=>{rows=s.docs.map(d=>({id:d.id,...d.data()}));render()},e=>{$("store-status").textContent="Sync paused. Reload the page to reconnect."});
+    db.doc("settings/targets").onSnapshot(s=>{if(s.exists){targets={...DEFAULT_TARGETS,...s.data()};renderTargets();render()}});
+  }else{mode="local";let saved=ls.get("mrt.rows");if(!saved){saved=EXAMPLES.map((r,i)=>({...r,id:"ex"+i}));}rows=saved;targets={...DEFAULT_TARGETS,...(ls.get("mrt.targets")||{})};
+    $("store-status").textContent="Saved in this browser only.";renderTargets();render()}
+}
+async function addRow(r){if(mode==="db"){await db.collection("activities").add(r)}else{rows.push({...r,id:"l"+Date.now()+Math.random().toString(36).slice(2,6)});ls.set("mrt.rows",rows);render()}}
+async function delRow(id){if(mode==="db"){await db.doc("activities/"+id).delete()}else{rows=rows.filter(r=>r.id!==id);ls.set("mrt.rows",rows);render()}}
+
+$("f").addEventListener("submit",async e=>{e.preventDefault();
+  const r={date:$("f-date").value||today(),type:$("f-type").value,stage:$("f-stage").value,outcome:$("f-outcome").value,account:$("f-account").value.trim(),contact:$("f-contact").value.trim(),owner:$("f-owner").value.trim(),count:Math.max(1,+$("f-count").value||1),value:Math.max(0,+$("f-value").value||0),next:$("f-next").value.trim(),notes:$("f-notes").value.trim(),createdAt:new Date().toISOString()};
+  if(!r.account){$("f-account").focus();return}
+  ls.set("mrt.owner",r.owner);
+  try{await addRow(r);toast("Activity saved");["f-account","f-contact","f-next","f-notes","f-value"].forEach(i=>$(i).value="");$("f-count").value=1}
+  catch(err){toast(err&&err.code==="quota_exceeded"?"Your tracker is full. Delete old entries to add more.":"Could not save. Check your connection and try again.")}
+});
+$("f").addEventListener("reset",()=>setTimeout(()=>{$("f-date").value=today();$("f-owner").value=ls.get("mrt.owner")||""}));
+$("rows").addEventListener("click",async e=>{const b=e.target.closest("[data-del]");if(!b)return;
+  if(b.dataset.armed){try{await delRow(b.dataset.del);toast("Entry deleted")}catch(err){toast("Could not delete. Try again.")}}
+  else{b.dataset.armed="1";b.textContent="Confirm";b.style.borderColor="var(--bad)";b.style.color="var(--bad)";setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent="Delete";b.style.cssText=""}},3000)}});
+$("clear-ex").onclick=async()=>{const ex=rows.filter(r=>r.example);for(const r of ex){try{await delRow(r.id)}catch(e){}}if(mode==="local"){rows=rows.filter(r=>!r.example);ls.set("mrt.rows",rows);render()}toast("Example rows removed")};
+$("q").addEventListener("input",renderTable);$("ft").addEventListener("change",renderTable);
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{range=b.dataset.r;document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-selected",x===b));render()});
+$("save-t").onclick=async()=>{const t={};TYPES.forEach(([k])=>t[k]=Math.max(0,+$("t-"+k).value||0));targets=t;
+  try{if(mode==="db")await db.doc("settings/targets").set(t);else ls.set("mrt.targets",t);toast("Targets saved");render()}catch(e){toast("Could not save targets. Try again.")}};
+$("copy").onclick=async()=>{const txt=$("report-text").textContent;try{await navigator.clipboard.writeText(txt);toast("Report copied")}catch(e){const r=document.createRange();r.selectNodeContents($("report-text"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Selected. Press Ctrl+C to copy")}};
+
+renderTargets();render();boot();
+</script>
+</body></html>
