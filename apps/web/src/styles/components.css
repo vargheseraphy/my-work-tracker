@@ -46,16 +46,16 @@
 .btn-primary {
   background: var(--text);
   border-color: var(--text);
-  color: #fff;
+  color: var(--bg);
 }
 .btn-primary:hover:not(:disabled) {
-  background: #2a2a2a;
+  background: var(--ink-2);
 }
 .btn-primary:disabled,
 .btn:disabled {
-  background: #ecece8;
-  border-color: #ecece8;
-  color: #6b6b6b;
+  background: var(--surface-2);
+  border-color: var(--line);
+  color: var(--muted);
   cursor: not-allowed;
 }
 .btn-ghost {
@@ -122,7 +122,7 @@
 .input.ok,
 .select.ok {
   border-color: var(--good-line);
-  background: #fbfefc;
+  background: var(--good-bg);
 }
 .input.err,
 .select.err {
@@ -234,16 +234,16 @@
   flex-shrink: 0;
 }
 .dot.g {
-  background: #3f9a63;
+  background: var(--good);
 }
 .dot.a {
-  background: #d99a1e;
+  background: var(--warn);
 }
 .dot.r {
-  background: #c8513c;
+  background: var(--bad);
 }
 .dot.w {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border-strong);
 }
 
@@ -291,7 +291,7 @@
 .bar {
   height: 6px;
   border-radius: 3px;
-  background: #ecece8;
+  background: var(--surface-2);
   overflow: hidden;
 }
 .bar > i {
@@ -304,10 +304,10 @@
   background: var(--gold);
 }
 .bar > i.behind {
-  background: #9aa8b7;
+  background: var(--c6);
 }
 .bar > i.good {
-  background: #3f9a63;
+  background: var(--good);
 }
 
 /* ---------- tables ---------- */
@@ -430,7 +430,7 @@
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  background: #d6d6d0;
+  background: var(--line-strong);
   transition: background 0.15s;
 }
 .switch i::after {
@@ -441,7 +441,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
   transition: transform 0.15s;
 }
 .switch input:checked + i {
@@ -501,7 +501,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: var(--text);
-  color: #fff;
+  color: var(--bg);
   padding: 12px 18px;
   border-radius: 10px;
   font-size: 14px;
@@ -570,20 +570,20 @@
   font-size: 10px;
 }
 .c.sub {
-  background: #cfe6d7;
+  background: var(--good-bg);
   color: var(--good);
 }
 .c.late {
-  background: #f6e2a8;
+  background: var(--warn-bg);
   color: var(--warn);
 }
 .c.miss {
-  background: #f2c3b8;
+  background: var(--bad-bg);
   color: var(--bad);
 }
 .c.off {
-  background: #efefeb;
-  color: #8a8a84;
+  background: var(--surface-2);
+  color: var(--muted);
 }
 .c.hol {
   background: var(--info-bg);
@@ -679,7 +679,7 @@
   padding: 0 5px;
   border-radius: 9px;
   background: var(--bad);
-  color: #fff;
+  color: var(--bg);
   font-family: var(--mono);
   font-size: 10px;
   display: flex;
