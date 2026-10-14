@@ -1048,3 +1048,33 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+
+/* ---------- per-brand field groups (db/migrations/0013) ---------- */
+.brand-group {
+  border-top: 1px solid var(--line);
+  padding: 14px 0 6px;
+}
+.brand-group:first-of-type {
+  border-top: 0;
+}
+.brand-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.brand-group-head b {
+  font-size: 14px;
+  font-weight: 600;
+}
+.brand-row {
+  border-top: 0;
+  padding: 7px 0 7px 14px;
+  border-left: 2px solid var(--line);
+  margin-left: 2px;
+}
+.brand-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+}

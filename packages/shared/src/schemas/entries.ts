@@ -14,6 +14,8 @@ export const putValueBody = z
     numValue: z.number().min(0).max(1_000_000_000).nullable().optional(),
     textValue: z.string().max(2000).nullable().optional(),
     note: z.string().max(500).nullable().optional(),
+    /** Which brand this answer belongs to. Omitted for measures that are not split by brand. */
+    brandId: uuid.nullable().optional(),
   })
   .refine(
     (v) => v.numValue !== undefined || v.textValue !== undefined || v.note !== undefined,

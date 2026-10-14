@@ -11,7 +11,8 @@ import { notFound } from '../errors.js';
 export const METRIC_COLUMNS = `
   key, label, log_type as "logType", group_name as "groupName",
   value_type as "valueType", proof, auto_from as "autoFrom",
-  is_target_measure as "isTargetMeasure", sort_order as "sortOrder"`;
+  is_target_measure as "isTargetMeasure", sort_order as "sortOrder",
+  per_brand as "perBrand"`;
 
 interface EntryRow {
   id: string;
@@ -85,14 +86,15 @@ export async function findEntry(
 export async function readValues(client: PoolClient, entryId: string): Promise<EntryValueDto[]> {
   const rows = await many<{
     metricKey: string;
+    brandId: string | null;
     numValue: number | null;
     textValue: string | null;
     note: string | null;
     updatedAt: Date;
   }>(
     client,
-    `select metric_key as "metricKey", num_value as "numValue", text_value as "textValue",
-            note, updated_at as "updatedAt"
+    `select metric_key as "metricKey", brand_id as "brandId", num_value as "numValue",
+            text_value as "textValue", note, updated_at as "updatedAt"
        from entry_values where entry_id = $1`,
     [entryId],
   );
@@ -180,6 +182,7 @@ export async function upsertValue(
 ): Promise<EntryValueDto> {
   const row = await one<{
     metricKey: string;
+    brandId: string | null;
     numValue: number | null;
     textValue: string | null;
     note: string | null;
@@ -342,4 +345,21 @@ export async function awardMeetings(client: PoolClient, entryId: string): Promis
     [entryId],
   );
   return row?.awarded ?? false;
+}
+
+
+/** The brands this person is assigned, in display order (db/migrations/0013). */
+export async function readUserBrands(
+  client: PoolClient,
+  userId: string,
+): Promise<{ id: string; name: string }[]> {
+  return many<{ id: string; name: string }>(
+    client,
+    `select b.id, b.name
+       from user_brands ub
+       join brands b on b.id = ub.brand_id
+      where ub.user_id = $1 and b.active
+      order by b.sort_order, b.name`,
+    [userId],
+  );
 }

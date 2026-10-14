@@ -88,6 +88,8 @@ export interface MetricDefinition {
   autoFrom: string | null;
   isTargetMeasure: boolean;
   sortOrder: number;
+  /** Answered once per brand the person is assigned (db/migrations/0013). */
+  perBrand: boolean;
 }
 
 export function isDailyMetricKey(key: string): key is DailyMetricKey {

@@ -46,6 +46,7 @@ interface SaveBody {
   numValue?: number | null;
   textValue?: string | null;
   note?: string | null;
+  brandId?: string | null;
 }
 
 /** Save one field, retrying up to three times before giving up. */
@@ -80,18 +81,23 @@ export function NumberField({
   initialValue,
   readOnly,
   onSaved,
+  brandId = null,
 }: {
   entryId: string;
   field: MetricDefinition;
   initialValue: number | null;
   readOnly: boolean;
   onSaved: (value: number | null) => void;
+  /** Set for a per-brand measure, so each brand keeps its own value, draft and input id. */
+  brandId?: string | null;
 }) {
-  const draft = readDraft(entryId, field.key, 'num');
+  // The brand is part of the identity of this field: two brands on one metric are two answers.
+  const part = brandId ? `num:${brandId}` : 'num';
+  const draft = readDraft(entryId, field.key, part);
   const [text, setText] = useState(draft ?? (initialValue === null ? '' : String(initialValue)));
   const [state, setState] = useState<SaveState>('idle');
   const timer = useRef<ReturnType<typeof setTimeout>>();
-  const inputId = `f-${field.key}`;
+  const inputId = `f-${field.key}${brandId ? `-${brandId}` : ''}`;
 
   const flush = useCallback(
     (raw: string) => {
@@ -102,20 +108,20 @@ export function NumberField({
         return;
       }
       setState('saving');
-      saveValue(entryId, field.key, { numValue: value })
+      saveValue(entryId, field.key, { numValue: value, ...(brandId ? { brandId } : {}) })
         .then(() => {
           setState('saved');
-          writeDraft(entryId, field.key, 'num', null);
+          writeDraft(entryId, field.key, part, null);
           onSaved(value);
         })
         .catch(() => setState('failed'));
     },
-    [entryId, field.key, onSaved],
+    [entryId, field.key, onSaved, brandId, part],
   );
 
   const onChange = (raw: string) => {
     setText(raw);
-    writeDraft(entryId, field.key, 'num', raw);
+    writeDraft(entryId, field.key, part, raw);
     setState('idle');
     clearTimeout(timer.current);
     timer.current = setTimeout(() => flush(raw), 600);
@@ -160,6 +166,7 @@ export function TextField({
   readOnly,
   rows = 3,
   onSaved,
+  brandId = null,
 }: {
   entryId: string;
   field: MetricDefinition;
@@ -167,32 +174,37 @@ export function TextField({
   readOnly: boolean;
   rows?: number;
   onSaved: (value: string) => void;
+  /** Set for a per-brand measure, so each brand keeps its own value and draft. */
+  brandId?: string | null;
 }) {
-  const draft = readDraft(entryId, field.key, 'text');
+  const part = brandId ? `text:${brandId}` : 'text';
+  const draft = readDraft(entryId, field.key, part);
   const [text, setText] = useState(draft ?? initialValue ?? '');
   const [state, setState] = useState<SaveState>('idle');
   const timer = useRef<ReturnType<typeof setTimeout>>();
-  const inputId = `t-${field.key}`;
+  const inputId = `t-${field.key}${brandId ? `-${brandId}` : ''}`;
 
   const flush = useCallback(
     (raw: string) => {
       setState('saving');
-      saveValue(entryId, field.key, { textValue: raw })
+      saveValue(entryId, field.key, { textValue: raw, ...(brandId ? { brandId } : {}) })
         .then(() => {
           setState('saved');
-          writeDraft(entryId, field.key, 'text', null);
+          writeDraft(entryId, field.key, part, null);
           onSaved(raw);
         })
         .catch(() => setState('failed'));
     },
-    [entryId, field.key, onSaved],
+    [entryId, field.key, onSaved, brandId, part],
   );
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
   return (
     <div className="field">
-      <label htmlFor={inputId}>{field.label}</label>
+      <label htmlFor={inputId} className={brandId ? 'sr-only' : undefined}>
+        {field.label}
+      </label>
       <textarea
         id={inputId}
         className="textarea"
@@ -203,7 +215,7 @@ export function TextField({
         disabled={readOnly}
         onChange={(event) => {
           setText(event.target.value);
-          writeDraft(entryId, field.key, 'text', event.target.value);
+          writeDraft(entryId, field.key, part, event.target.value);
           setState('idle');
           clearTimeout(timer.current);
           timer.current = setTimeout(() => flush(event.target.value), 600);

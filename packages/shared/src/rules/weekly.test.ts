@@ -13,6 +13,7 @@ function field(over: Partial<MetricDefinition> & { key: string; label: string })
     autoFrom: null,
     isTargetMeasure: false,
     sortOrder: 10,
+    perBrand: false,
     ...over,
   };
 }

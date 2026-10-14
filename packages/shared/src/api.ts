@@ -40,8 +40,16 @@ export interface Profile {
   active: boolean;
 }
 
+/** One of our own company accounts. Channel activity is logged against one of these. */
+export interface BrandDto {
+  id: string;
+  name: string;
+}
+
 export interface EntryValueDto {
   metricKey: string;
+  /** Null for a measure that is not split by brand. */
+  brandId: string | null;
   numValue: number | null;
   textValue: string | null;
   note: string | null;
@@ -95,6 +103,8 @@ export interface EntryScreenDto {
   spikeMultiplier: number;
   spikeMinAvg: number;
   dailyDueTime: string;
+  /** The brands this person is assigned, in order. Empty if an admin has assigned none. */
+  brands: BrandDto[];
   /** Weekly only. */
   autoTotals?: Record<string, number>;
   weeklyIsOpen?: boolean;

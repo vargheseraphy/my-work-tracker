@@ -16,6 +16,7 @@ import {
   openEntry,
   readEntry,
   readFields,
+  readUserBrands,
   setNoSearchActivity,
   awardMeetings,
   awardWeekTarget,
@@ -245,6 +246,7 @@ async function buildScreen(
     spikeMultiplier: numberSetting(settings, 'spike_multiplier', 3),
     spikeMinAvg: numberSetting(settings, 'spike_min_avg', 5),
     dailyDueTime: timeSetting(settings, 'daily_due_time', '19:00'),
+    brands: await readUserBrands(client, userId),
   };
 
   if (type === 'weekly') {

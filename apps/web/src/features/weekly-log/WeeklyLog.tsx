@@ -278,7 +278,53 @@ function WeeklyField({
   onChanged: () => void;
   extra?: React.ReactNode;
 }) {
-  const value = data.entry.values.find((v) => v.metricKey === field.key);
+  // A per-brand measure is answered once for each brand the person runs. Rendering a labelled
+  // row per brand is what makes "which account is this?" answerable at the point of entry.
+  if (field.perBrand && data.brands.length > 0 && field.valueType !== 'file') {
+    return (
+      <div className="brand-group">
+        <div className="brand-group-head">
+          <b>{field.label}</b>
+          <span className="hint">One figure per account</span>
+        </div>
+        {data.brands.map((brand) => {
+          const brandValue = data.entry.values.find(
+            (v) => v.metricKey === field.key && v.brandId === brand.id,
+          );
+          return (
+            <div className="frow brand-row" key={brand.id}>
+              <span className="flabel">
+                <b className="brand-name">{brand.name}</b>
+              </span>
+              {field.valueType === 'text' ? (
+                <TextField
+                  entryId={data.entry.id}
+                  field={field}
+                  initialValue={brandValue?.textValue ?? null}
+                  readOnly={!editable}
+                  rows={2}
+                  brandId={brand.id}
+                  onSaved={onChanged}
+                />
+              ) : (
+                <NumberField
+                  entryId={data.entry.id}
+                  field={field}
+                  initialValue={brandValue?.numValue ?? null}
+                  readOnly={!editable}
+                  brandId={brand.id}
+                  onSaved={onChanged}
+                />
+              )}
+            </div>
+          );
+        })}
+        {extra}
+      </div>
+    );
+  }
+
+  const value = data.entry.values.find((v) => v.metricKey === field.key && v.brandId === null);
 
   if (field.valueType === 'text') {
     const forms = data.entry.values.find((v) => v.metricKey === 'wk_forms')?.numValue ?? 0;
