@@ -24,6 +24,7 @@ import {
   ProofSlot,
   TextField,
 } from '../../components/fields.jsx';
+import { BrandPicker } from '../../components/BrandPicker.jsx';
 import {
   Banner,
   Button,
@@ -44,6 +45,8 @@ export function WeeklyLog() {
   const queryClient = useQueryClient();
   const toast = useToast();
   const [errors, setErrors] = useState<string[]>([]);
+  // Which account the per-brand fields are currently showing. Null until the screen loads.
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
 
   const { data: home } = useQuery({
     queryKey: ['home'],
@@ -97,6 +100,8 @@ export function WeeklyLog() {
   if (!data) return <Empty>That week could not be opened.</Empty>;
 
   const editable = data.entry.status === 'draft' || data.entry.status === 'unlocked';
+  // Default to the first account once the screen arrives; the picker owns it from then on.
+  const brandId = selectedBrand ?? data.brands[0]?.id ?? null;
   const autoTotals = data.autoTotals ?? {};
   const isOpen = data.weeklyIsOpen ?? false;
 
@@ -154,6 +159,16 @@ export function WeeklyLog() {
           tone="info"
           title="This is a preview"
           body="The weekly log opens on Friday at 16:00. You can fill it in now, but it cannot be submitted yet."
+        />
+      ) : null}
+
+      {editable && data.brands.length > 0 ? (
+        <BrandPicker
+          brands={data.brands}
+          value={brandId ?? ''}
+          onChange={setSelectedBrand}
+          fields={data.fields}
+          values={data.entry.values}
         />
       ) : null}
 
@@ -216,11 +231,13 @@ export function WeeklyLog() {
                     />
                   ) : (
                     <WeeklyField
-                      key={field.key}
+                      // Keyed by brand so the inputs reset to that account's values on switch.
+                      key={`${field.key}-${field.perBrand ? brandId : 'all'}`}
                       field={field}
                       data={data}
                       editable={editable}
                       onChanged={refresh}
+                      selectedBrand={brandId}
                       extra={
                         field.key === 'wk_followers' && followerGrowth.change !== null ? (
                           <span className="xs muted">
@@ -271,69 +288,33 @@ function WeeklyField({
   editable,
   onChanged,
   extra,
+  selectedBrand,
 }: {
   field: MetricDefinition;
   data: EntryScreenDto;
   editable: boolean;
   onChanged: () => void;
   extra?: React.ReactNode;
+  selectedBrand: string | null;
 }) {
-  // A per-brand measure is answered once for each brand the person runs. Rendering a labelled
-  // row per brand is what makes "which account is this?" answerable at the point of entry.
-  if (field.perBrand && data.brands.length > 0 && field.valueType !== 'file') {
-    return (
-      <div className="brand-group">
-        <div className="brand-group-head">
-          <b>{field.label}</b>
-          <span className="hint">One figure per account</span>
-        </div>
-        {data.brands.map((brand) => {
-          const brandValue = data.entry.values.find(
-            (v) => v.metricKey === field.key && v.brandId === brand.id,
-          );
-          return (
-            <div className="frow brand-row" key={brand.id}>
-              <span className="flabel">
-                <b className="brand-name">{brand.name}</b>
-              </span>
-              {field.valueType === 'text' ? (
-                <TextField
-                  entryId={data.entry.id}
-                  field={field}
-                  initialValue={brandValue?.textValue ?? null}
-                  readOnly={!editable}
-                  rows={2}
-                  brandId={brand.id}
-                  onSaved={onChanged}
-                />
-              ) : (
-                <NumberField
-                  entryId={data.entry.id}
-                  field={field}
-                  initialValue={brandValue?.numValue ?? null}
-                  readOnly={!editable}
-                  brandId={brand.id}
-                  onSaved={onChanged}
-                />
-              )}
-            </div>
-          );
-        })}
-        {extra}
-      </div>
-    );
-  }
-
-  const value = data.entry.values.find((v) => v.metricKey === field.key && v.brandId === null);
+  // One set of fields, bound to whichever account is selected above. Repeating a column per
+  // brand did not survive three or four accounts.
+  const brandId = field.perBrand && data.brands.length > 0 ? selectedBrand : null;
+  const value = data.entry.values.find(
+    (v) => v.metricKey === field.key && v.brandId === brandId,
+  );
 
   if (field.valueType === 'text') {
-    const forms = data.entry.values.find((v) => v.metricKey === 'wk_forms')?.numValue ?? 0;
+    const forms =
+      data.entry.values.find((v) => v.metricKey === 'wk_forms' && v.brandId === brandId)
+        ?.numValue ?? 0;
     if (field.key === 'wk_form_companies' && forms === 0) return null;
     return (
       <div style={{ padding: '12px 0' }}>
         <TextField
           entryId={data.entry.id}
           field={field}
+          brandId={brandId}
           initialValue={value?.textValue ?? null}
           readOnly={!editable}
           rows={field.groupName === 'Reflection' ? 3 : 2}
@@ -379,6 +360,7 @@ function WeeklyField({
       <NumberField
         entryId={data.entry.id}
         field={field}
+        brandId={brandId}
         initialValue={value?.numValue ?? null}
         readOnly={!editable}
         onSaved={onChanged}
