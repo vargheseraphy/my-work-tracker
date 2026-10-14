@@ -38,3 +38,24 @@ export function currentTheme(): Theme {
 export function initTheme(): void {
   document.documentElement.setAttribute('data-theme', storedTheme() ?? 'light');
 }
+
+/* ---------- sidebar ---------- */
+
+const NAV_KEY = 'repotra.nav';
+
+/** Remembered per browser, like the theme. Expanded unless the person chose otherwise. */
+export function storedNavCollapsed(): boolean {
+  try {
+    return window.localStorage.getItem(NAV_KEY) === 'collapsed';
+  } catch {
+    return false;
+  }
+}
+
+export function storeNavCollapsed(collapsed: boolean): void {
+  try {
+    window.localStorage.setItem(NAV_KEY, collapsed ? 'collapsed' : 'expanded');
+  } catch {
+    // A remembered choice is a convenience, not a requirement.
+  }
+}

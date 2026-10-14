@@ -3,14 +3,21 @@
  * "Differences from the prototypes"), with live badges for missing days and overdue tasks.
  */
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import type { HomeDto, NotificationsDto } from '@gtm/shared';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { NotificationBell } from './NotificationBell.jsx';
-import { applyTheme, currentTheme, type Theme } from '../theme.js';
+import { NavIcon } from './NavIcon.jsx';
+import {
+  applyTheme,
+  currentTheme,
+  storeNavCollapsed,
+  storedNavCollapsed,
+  type Theme,
+} from '../theme.js';
 
 /**
  * The Repotra mark: a growth line climbing to an arrow, the activity-over-time idea the app is
@@ -39,47 +46,92 @@ export function Logo({ size = 22 }: { size?: number }) {
 }
 
 /**
- * Light or dark, remembered in this browser. It carries a word as well as an icon, so the state
- * is never signalled by shape alone.
+ * Who you are signed in as, and the two things that belong to you rather than to the page:
+ * the theme and signing out. Collapsing the sidebar hides the name but keeps the avatar, so
+ * the menu is reachable either way.
  */
-function ThemeToggle() {
+function UserMenu({
+  fullName,
+  roleLabel,
+  collapsed,
+  onSignOut,
+}: {
+  fullName: string;
+  roleLabel: string;
+  collapsed: boolean;
+  onSignOut: () => void;
+}) {
+  const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(currentTheme);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const dark = theme === 'dark';
 
+  // Close on Escape or a click anywhere else, like any other menu.
+  useEffect(() => {
+    if (!open) return undefined;
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+    function onDown(event: MouseEvent) {
+      if (!wrapRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [open]);
+
   return (
-    <button
-      type="button"
-      className="btn btn-ghost btn-sm"
-      aria-pressed={dark}
-      title={dark ? 'Switch to the light theme' : 'Switch to the dark theme'}
-      onClick={() => {
-        const next: Theme = dark ? 'light' : 'dark';
-        applyTheme(next);
-        setTheme(next);
-      }}
-    >
-      {dark ? (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="2" />
-          <path
-            d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      ) : (
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M20 14.2A8.2 8.2 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-      {dark ? 'Light' : 'Dark'}
-    </button>
+    <div className="me-wrap" ref={wrapRef}>
+      {open ? (
+        <div className="me-menu" role="menu">
+          <button
+            type="button"
+            role="menuitem"
+            className="me-item"
+            onClick={() => {
+              const next: Theme = dark ? 'light' : 'dark';
+              applyTheme(next);
+              setTheme(next);
+            }}
+          >
+            <span aria-hidden="true">{dark ? '\u2600' : '\u263D'}</span>
+            {dark ? 'Light theme' : 'Dark theme'}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="me-item"
+            onClick={() => {
+              setOpen(false);
+              onSignOut();
+            }}
+          >
+            <span aria-hidden="true">{'\u21AA'}</span>
+            Sign out
+          </button>
+        </div>
+      ) : null}
+
+      <button
+        type="button"
+        className="me"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        title={collapsed ? `${fullName}, ${roleLabel}` : undefined}
+        onClick={() => setOpen((was) => !was)}
+      >
+        <span className="avatar" aria-hidden="true">
+          {initials(fullName)}
+        </span>
+        <span className="who">
+          <b>{fullName}</b>
+          <span>{roleLabel}</span>
+        </span>
+      </button>
+    </div>
   );
 }
 
@@ -87,6 +139,7 @@ interface NavItem {
   label?: string;
   to?: string;
   text?: string;
+  icon?: string;
   badge?: string;
   /** Neutral unless the thing genuinely needs attention. Nothing routine is red. */
   badgeTone?: 'info' | 'warn' | 'bad';
@@ -107,6 +160,7 @@ const ROLE_LABEL: Record<string, string> = {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
+  const [collapsed, setCollapsed] = useState(storedNavCollapsed);
 
   // Badges only mean anything to a contributor, so only they fetch home.
   const { data: home } = useQuery({
@@ -132,49 +186,87 @@ export function AppShell({ children }: { children: ReactNode }) {
     user.role === 'contributor'
       ? [
           { label: 'My work' },
-          { to: '/', text: 'Home', end: true },
+          { to: '/', text: 'Home', icon: 'home', end: true },
           {
             to: '/daily',
             text: 'Daily log',
+            icon: 'daily',
             // Not red: since 0009 an open day blocks nothing, so this is a count, not an alarm.
             ...(missing > 0 ? { badge: `${missing} open`, badgeTone: 'info' as const } : {}),
           },
-          { to: '/weekly', text: 'Weekly log' },
+          { to: '/weekly', text: 'Weekly log', icon: 'weekly' },
           {
             to: '/tasks',
             text: 'My tasks',
+            icon: 'tasks',
             ...(overdue > 0 ? { badge: `${overdue} overdue`, badgeTone: 'warn' as const } : {}),
           },
-          { to: '/abm', text: 'ABM tracker' },
+          { to: '/abm', text: 'ABM tracker', icon: 'abm' },
         ]
       : [
           { label: 'Team' },
-          { to: '/admin', text: 'Dashboard', end: true },
-          { to: '/report', text: 'Weekly report' },
-          { to: '/people', text: 'People' },
+          { to: '/admin', text: 'Dashboard', icon: 'dashboard', end: true },
+          { to: '/report', text: 'Weekly report', icon: 'report' },
+          { to: '/people', text: 'People', icon: 'people' },
           ...(user.role === 'admin'
-            ? [{ to: '/admin/tasks', text: 'Task management' }]
+            ? [{ to: '/admin/tasks', text: 'Task management', icon: 'taskAdmin' }]
             : []),
-          { to: '/abm', text: 'ABM tracker' },
+          { to: '/abm', text: 'ABM tracker', icon: 'abm' },
           ...(user.role === 'admin'
             ? [
                 { label: 'Setup' },
-                { to: '/admin/calendar', text: 'Holidays and leave' },
-                { to: '/admin/settings', text: 'Targets and fields' },
+                { to: '/admin/calendar', text: 'Holidays and leave', icon: 'calendar' },
+                { to: '/admin/settings', text: 'Targets and fields', icon: 'settings' },
               ]
             : []),
         ];
 
   return (
-    <div className="app">
+    <div className={`app${collapsed ? ' app-collapsed' : ''}`}>
       <a className="skip" href="#main">
         Skip to the main content
       </a>
       <aside className="sidebar">
-        <Link className="brand" to={user.role === 'contributor' ? '/' : '/admin'}>
-          <Logo />
-          <b>Repotra</b>
-        </Link>
+        <div className="side-top">
+          <Link
+            className="brand"
+            to={user.role === 'contributor' ? '/' : '/admin'}
+            title={collapsed ? 'Repotra' : undefined}
+          >
+            <Logo />
+            <b>Repotra</b>
+          </Link>
+          <div className="side-top-actions">
+            <NotificationBell data={notifications} />
+            <button
+              type="button"
+              className="side-collapse"
+              aria-pressed={collapsed}
+              title={collapsed ? 'Expand the menu' : 'Collapse the menu'}
+              aria-label={collapsed ? 'Expand the menu' : 'Collapse the menu'}
+              onClick={() => {
+                setCollapsed((was) => {
+                  storeNavCollapsed(!was);
+                  return !was;
+                });
+              }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 5.5h16M4 12h16M4 18.5h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
 
         <nav className="nav" aria-label="Main">
           {items.map((item, index) =>
@@ -183,8 +275,15 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {item.label}
               </div>
             ) : (
-              <NavLink key={item.to ?? index} to={item.to!} end={item.end}>
-                <span>{item.text}</span>
+              <NavLink
+                key={item.to ?? index}
+                to={item.to!}
+                end={item.end}
+                title={collapsed ? item.text : undefined}
+              >
+                <NavIcon name={item.icon ?? 'home'} />
+                {/* Kept in the DOM when collapsed, so the link still has a name. */}
+                <span className="nav-text">{item.text}</span>
                 {item.badge ? (
                   <span className={`pill ${item.badgeTone ?? 'info'}`}>{item.badge}</span>
                 ) : null}
@@ -193,30 +292,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           )}
         </nav>
 
-        {/* Actions sit above the divider; who you are signed in as reads last. */}
-        <div className="side-actions row">
-          <NotificationBell data={notifications} />
-          <ThemeToggle />
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => {
-              void signOut();
-            }}
-          >
-            Sign out
-          </button>
-        </div>
-
-        <div className="me">
-          <div className="avatar" aria-hidden="true">
-            {initials(user.fullName)}
-          </div>
-          <div className="who">
-            <b>{user.fullName}</b>
-            <span>{ROLE_LABEL[user.role] ?? user.role}</span>
-          </div>
-        </div>
+        <UserMenu
+          fullName={user.fullName}
+          roleLabel={ROLE_LABEL[user.role] ?? user.role}
+          collapsed={collapsed}
+          onSignOut={() => {
+            void signOut();
+          }}
+        />
       </aside>
 
       <main className="main" id="main">
