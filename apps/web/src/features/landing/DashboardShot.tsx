@@ -7,6 +7,8 @@
  * The names are invented and the figures are illustrative.
  */
 
+import { useCountUp } from './useCountUp.js';
+
 const PEOPLE = [
   { name: 'Tanzil', days: 'SSSSS·SSSLS·SSSSS·SS', done: '10 of 10' },
   { name: 'Anil', days: 'SSSSS·SSSSS·SSMSS·SS', done: '9 of 10' },
@@ -22,11 +24,38 @@ const TARGETS = [
 ];
 
 const KPIS = [
-  { label: 'Logs this week', value: '28', sub: 'of 30 · 3 of 5 days gone', tone: 'c1' },
-  { label: 'Missing', value: '2', sub: 'Anil · Wed 08 Oct', tone: 'c4' },
-  { label: 'Meetings booked', value: '11', sub: 'Up from 7 last week', tone: 'c3' },
-  { label: 'Overdue tasks', value: '3', sub: 'Across the team', tone: 'c5' },
+  { label: 'Logs this week', value: 28, sub: 'of 30 · 3 of 5 days gone', tone: 'c1' },
+  { label: 'Missing', value: 2, sub: 'Anil · Wed 08 Oct', tone: 'c4' },
+  { label: 'Meetings booked', value: 11, sub: 'Up from 7 last week', tone: 'c3' },
+  { label: 'Overdue tasks', value: 3, sub: 'Across the team', tone: 'c5' },
 ];
+
+/** One KPI, counting up on arrival. Staggered so the row fills left to right. */
+function Kpi({
+  label,
+  value,
+  sub,
+  tone,
+  index,
+}: {
+  label: string;
+  value: number;
+  sub: string;
+  tone: string;
+  index: number;
+}) {
+  const shown = useCountUp(value, 1200, 420 + index * 130);
+  return (
+    <div className="shot-kpi glass">
+      <span className="shot-kpi-label">
+        <i className={`shot-chip ${tone}`} />
+        {label}
+      </span>
+      <b>{shown}</b>
+      <span className="shot-kpi-sub">{sub}</span>
+    </div>
+  );
+}
 
 export function DashboardShot() {
   return (
@@ -58,22 +87,15 @@ export function DashboardShot() {
             </div>
 
             <div className="shot-kpis">
-              {KPIS.map((kpi) => (
-                <div className="shot-kpi glass" key={kpi.label}>
-                  <span className="shot-kpi-label">
-                    <i className={`shot-chip ${kpi.tone}`} />
-                    {kpi.label}
-                  </span>
-                  <b>{kpi.value}</b>
-                  <span className="shot-kpi-sub">{kpi.sub}</span>
-                </div>
+              {KPIS.map((kpi, i) => (
+                <Kpi key={kpi.label} {...kpi} index={i} />
               ))}
             </div>
 
             <div className="shot-cols">
               <section className="shot-card">
                 <h4>Did everyone log?</h4>
-                {PEOPLE.map((person) => (
+                {PEOPLE.map((person, row) => (
                   <div className="shot-row" key={person.name}>
                     <span className="shot-name">{person.name}</span>
                     <span className="shot-cells">
@@ -89,6 +111,8 @@ export function DashboardShot() {
                                   ? 'miss'
                                   : 'off'
                           }`}
+                          // Fills left to right, row after row, like a week being logged.
+                          style={{ animationDelay: `${600 + row * 180 + index * 26}ms` }}
                         />
                       ))}
                     </span>
@@ -99,7 +123,7 @@ export function DashboardShot() {
 
               <section className="shot-card">
                 <h4>This week against target</h4>
-                {TARGETS.map((row) => (
+                {TARGETS.map((row, i) => (
                   <div className="shot-target" key={row.label}>
                     <span className="shot-target-top">
                       <span>{row.label}</span>
@@ -108,7 +132,13 @@ export function DashboardShot() {
                       </span>
                     </span>
                     <span className="shot-bar-track">
-                      <i className={row.tone} style={{ width: `${row.share}%` }} />
+                      <i
+                        className={row.tone}
+                        style={{
+                          width: `${row.share}%`,
+                          animationDelay: `${700 + i * 120}ms`,
+                        }}
+                      />
                     </span>
                   </div>
                 ))}

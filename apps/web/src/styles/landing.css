@@ -1103,3 +1103,141 @@
   line-height: 1.7;
   font-size: 14.5px;
 }
+
+/* ---------- the dashboard coming to life ----------
+   The shot animates once on load. Delays are set inline per element so the sequence reads as
+   a week being filled in: cells left to right, then the bars growing, while the figures count. */
+.shot-cell {
+  animation: cell-in 420ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+@keyframes cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+.shot-bar-track > i {
+  transform-origin: left center;
+  animation: bar-grow 900ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+.shot-kpi b {
+  font-variant-numeric: tabular-nums;
+}
+/* The active row in the drawn sidebar breathes, so the shot never looks frozen. */
+.shot-nav.on::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: nav-pulse 3.4s ease-in-out infinite;
+}
+.shot-nav {
+  position: relative;
+}
+@keyframes nav-pulse {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---------- the team section, moving ---------- */
+.lp-mini-bar > i {
+  transform-origin: left center;
+  animation: bar-grow 1100ms cubic-bezier(0.2, 0.8, 0.25, 1) 300ms both;
+}
+/* The flame flickers gently, the way it does on the real card. */
+.lp-mini-top span[aria-hidden] {
+  display: inline-block;
+  animation: flame-flicker 2.6s ease-in-out infinite;
+}
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  35% {
+    transform: scale(1.1) rotate(-4deg);
+  }
+  70% {
+    transform: scale(0.97) rotate(3deg);
+  }
+}
+/* The earned badge catches the light once in a while. */
+.lp-mini-on {
+  position: relative;
+  overflow: hidden;
+}
+.lp-mini-on::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 42%;
+  left: -50%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    color-mix(in srgb, var(--accent) 16%, transparent),
+    transparent
+  );
+  animation: sheen-sweep 5.5s ease-in-out infinite;
+}
+@keyframes sheen-sweep {
+  0%,
+  62% {
+    left: -50%;
+  }
+  86%,
+  100% {
+    left: 110%;
+  }
+}
+
+/* The points list arrives one line at a time. */
+.lp-anim .lp-points p {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.lp-anim [data-reveal].is-in .lp-points p,
+.lp-anim .lp-points[data-reveal].is-in p {
+  opacity: 1;
+  transform: none;
+}
+.lp-anim .lp-points[data-reveal].is-in p:nth-child(2) {
+  transition-delay: 100ms;
+}
+.lp-anim .lp-points[data-reveal].is-in p:nth-child(3) {
+  transition-delay: 200ms;
+}
+.lp-anim .lp-points[data-reveal].is-in p:nth-child(4) {
+  transition-delay: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot-cell,
+  .shot-bar-track > i,
+  .shot-nav.on::after,
+  .lp-mini-bar > i,
+  .lp-mini-top span[aria-hidden],
+  .lp-mini-on::after {
+    animation: none;
+  }
+  .lp-anim .lp-points p {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

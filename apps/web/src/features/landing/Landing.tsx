@@ -113,7 +113,7 @@ export function Landing() {
       </section>
 
       {/* 4 ─ what the screen tells you */}
-      <section className="lp-product" id="product">
+      <section className="theme-dark lp-product" id="product">
         <Bloom />
         <div className="lp-wrap">
           <header className="lp-head lp-head-centre" data-reveal>
@@ -160,7 +160,7 @@ export function Landing() {
       </section>
 
       {/* 6 ─ how it works */}
-      <section className="lp-steps">
+      <section className="theme-dark lp-steps">
         <Bloom />
         <div className="lp-wrap">
           <header className="lp-head" data-reveal>
@@ -228,7 +228,7 @@ export function Landing() {
       </section>
 
       {/* 8 ─ close */}
-      <section className="lp-close">
+      <section className="theme-dark lp-close">
         <Bloom />
         <div className="lp-wrap lp-close-in" data-reveal>
           <h2>Give your Monday back.</h2>
@@ -242,7 +242,7 @@ export function Landing() {
         </div>
       </section>
 
-      <footer className="lp-foot">
+      <footer className="theme-dark lp-foot">
         <div className="lp-wrap lp-foot-in">
           <span className="lp-brand">
             <Logo size={18} />
@@ -331,6 +331,11 @@ const FEATURES = [
     title: 'Everything exports',
     body: 'A printable weekly report and a monthly CSV. The data is never trapped in here.',
     icon: 'M12 3.5v11M8 11l4 4 4-4M4 19.5h16',
+  },
+  {
+    title: 'Proof, not just numbers',
+    body: 'Attach the screenshot or paste the link beside the figure it backs up, so a number can always be checked without asking anyone.',
+    icon: 'M9 12.5l2 2 4.5-4.5M7 4.5h10a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z',
   },
 ];
 
