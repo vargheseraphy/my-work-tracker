@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // Development only, so a Cloudflare quick tunnel can serve the dev server when sharing a
+    // build for testing. Production is served as static files by nginx, which never reads this.
+    allowedHosts: ['.trycloudflare.com'],
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:3000',

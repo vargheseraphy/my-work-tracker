@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Repotra">
+  <!-- The Repotra mark. Colours are literal: an SVG favicon cannot read the page's tokens. -->
+  <rect width="64" height="64" rx="13" fill="#4B3FD1"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 43 25 30 33 38 52 19"/>
+    <path d="M40 19h12v12"/>
+  </g>
+</svg>
