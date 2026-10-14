@@ -11,6 +11,7 @@
 import { Link } from 'react-router-dom';
 import { Logo } from '../../components/AppShell.jsx';
 import { DashboardShot } from './DashboardShot.jsx';
+import { GlassArt } from './GlassArt.jsx';
 import { useReveal } from './useReveal.js';
 
 export function Landing() {
@@ -35,35 +36,34 @@ export function Landing() {
         </div>
       </header>
 
-      {/* 1 ─ hero */}
+      {/* 1 ─ hero: the product is the hero, tilted and breaking past the fold */}
       <section className="theme-dark lp-hero">
-        <Orbs />
+        <GlassArt />
         <div className="lp-wrap lp-hero-in">
           <span className="lp-pill" data-reveal>
             <i className="lp-pill-dot" />
             Daily activity, weekly results
           </span>
-          <h1 data-reveal>
-            Stop chasing your team
-            <br />
-            for <em>updates</em>.
-          </h1>
+          <h1 data-reveal>Stop chasing your team.</h1>
           <p className="lp-lead" data-reveal>
-            Repotra is where a go-to-market team logs what they did, and where you see the week
-            take shape without asking anyone a thing. The rules live in the database, so the
-            numbers you read are the numbers that happened.
+            One screen, the whole week. Your team logs what they did; you read what happened.
           </p>
           <div className="lp-cta" data-reveal>
             <Link className="btn btn-primary lp-btn-lg" to="/signin">
               Sign in
             </Link>
-            <a className="btn lp-btn-lg lp-btn-glass" href="#product">
-              See the dashboard
+            <a className="btn lp-btn-lg lp-btn-glass" href="#features">
+              See what it does
             </a>
           </div>
-          <p className="lp-fine" data-reveal>
-            Invite only · Your admin creates accounts
-          </p>
+        </div>
+
+        {/* Tilted, lit from beneath, and deliberately cut off by the fold. */}
+        <div className="lp-stage">
+          <div className="lp-stage-glow" aria-hidden="true" />
+          <div className="lp-tilt">
+            <DashboardShot />
+          </div>
         </div>
       </section>
 
@@ -110,18 +110,21 @@ export function Landing() {
         </div>
       </section>
 
-      {/* 4 ─ the product shot */}
+      {/* 4 ─ what the screen tells you */}
       <section className="theme-dark lp-product" id="product">
-        <Orbs />
         <div className="lp-wrap">
           <header className="lp-head lp-head-centre" data-reveal>
             <span className="eyebrow">Your Monday view</span>
-            <h2>Who logged, who is on pace, what is stuck.</h2>
-            <p className="lp-lead">
-              One screen answers the three questions you would otherwise ask in a stand-up.
-            </p>
+            <h2>Three questions, answered before you ask them.</h2>
           </header>
-          <DashboardShot />
+          <div className="lp-answers">
+            {ANSWERS.map((a) => (
+              <article key={a.q} data-reveal>
+                <span className="lp-answer-q">{a.q}</span>
+                <p>{a.a}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -257,6 +260,21 @@ function Orbs() {
     </div>
   );
 }
+
+const ANSWERS = [
+  {
+    q: 'Did everyone log?',
+    a: 'A month grid, person by day. Late is kept separate from missing, so a slow Tuesday never looks like a no-show.',
+  },
+  {
+    q: 'Are we on pace?',
+    a: 'Every target measured against how much of the week has actually gone. Tuesday is judged against Tuesday.',
+  },
+  {
+    q: 'What is stuck?',
+    a: 'Overdue tasks, accounts that never went live, and the weeks nobody planned one. Visible without asking.',
+  },
+];
 
 const PAINS = [
   {
