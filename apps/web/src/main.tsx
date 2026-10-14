@@ -10,6 +10,7 @@ import { initTheme } from './theme.js';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/components.css';
+import './styles/landing.css';
 
 // Before the first render, so the page never flashes the wrong theme.
 initTheme();

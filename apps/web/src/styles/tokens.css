@@ -104,7 +104,11 @@
 /* A soft neutral grey, in the manner of a code editor or Teams, rather than the manual's deep
    navy: easier to sit in front of for a working day. The accent, status and chart hues are the
    manual's dark values, so the brand still reads. Every text tone clears 7:1 on its surface. */
-:root[data-theme='dark'] {
+/* `.theme-dark` lets one section carry the dark palette while the rest of the page stays
+   light, which the landing page uses to alternate bands. Custom properties cascade, so the
+   whole subtree picks it up. */
+:root[data-theme='dark'],
+.theme-dark {
   --bg: #1e2023;
   --surface: #26292d;
   --surface-2: #2f3338;

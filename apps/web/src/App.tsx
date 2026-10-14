@@ -18,6 +18,7 @@ import {
   SignIn,
 } from './features/auth/SignIn.jsx';
 import { Home } from './features/home/Home.jsx';
+import { Landing } from './features/landing/Landing.jsx';
 import { DailyLog } from './features/daily-log/DailyLog.jsx';
 import { WeeklyLog } from './features/weekly-log/WeeklyLog.jsx';
 import { MyTasks } from './features/tasks/MyTasks.jsx';
@@ -71,12 +72,21 @@ export function App() {
       <Route path="/no-access" element={<NoAccess />} />
 
       {/* contributor */}
+      {/* "/" is the public landing page when signed out, and the contributor home when in. */}
       <Route
         path="/"
         element={
-          <Guard roles={CONTRIBUTOR}>
-            <Home />
-          </Guard>
+          loading ? (
+            <Loading what="Opening the tracker" />
+          ) : !user ? (
+            <Landing />
+          ) : user.role === 'contributor' ? (
+            <Guard roles={CONTRIBUTOR}>
+              <Home />
+            </Guard>
+          ) : (
+            <Navigate to="/admin" replace />
+          )
         }
       />
       <Route
