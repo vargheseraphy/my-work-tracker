@@ -2,6 +2,14 @@
    Dark bands carry .theme-dark, which re-declares the palette for that subtree only.
    Every animation here is decoration and is switched off under prefers-reduced-motion. */
 
+/* `color` must be re-declared wherever the palette changes. A value like `color: var(--ink)`
+   set on .lp resolves once, against the light --ink, and then inherits that resolved colour
+   into the dark bands. Without this, headings inside a dark section render near-black on
+   near-black. The same trap applies to any property that reads a token high up the tree. */
+.theme-dark {
+  color: var(--ink);
+}
+
 .lp {
   background: var(--bg);
   color: var(--ink);
