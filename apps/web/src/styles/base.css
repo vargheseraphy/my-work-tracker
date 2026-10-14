@@ -18,7 +18,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* The gold keyline across the top of every page. */
+/* The accent keyline across the top of every page. */
 body::before {
   content: '';
   position: fixed;
@@ -165,8 +165,12 @@ textarea {
   background: var(--gold);
 }
 
-.me {
+.side-actions {
   margin-top: auto;
+  padding: 0 8px 12px;
+  gap: 8px;
+}
+.me {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -205,7 +209,9 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 1240px;
+  /* Centred, so a wide screen does not leave all the empty space on one side. */
+  max-width: 1600px;
+  margin-inline: auto;
   width: 100%;
   min-width: 0;
 }
@@ -379,7 +385,8 @@ textarea {
   .nav .label {
     display: none;
   }
-  .me {
+  .me,
+  .side-actions {
     margin: 0;
     border: 0;
     padding: 0;

@@ -88,6 +88,8 @@ interface NavItem {
   to?: string;
   text?: string;
   badge?: string;
+  /** Neutral unless the thing genuinely needs attention. Nothing routine is red. */
+  badgeTone?: 'info' | 'warn' | 'bad';
   end?: boolean;
 }
 
@@ -134,13 +136,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           {
             to: '/daily',
             text: 'Daily log',
-            ...(missing > 0 ? { badge: `${missing} missing` } : {}),
+            // Not red: since 0009 an open day blocks nothing, so this is a count, not an alarm.
+            ...(missing > 0 ? { badge: `${missing} open`, badgeTone: 'info' as const } : {}),
           },
           { to: '/weekly', text: 'Weekly log' },
           {
             to: '/tasks',
             text: 'My tasks',
-            ...(overdue > 0 ? { badge: `${overdue} overdue` } : {}),
+            ...(overdue > 0 ? { badge: `${overdue} overdue`, badgeTone: 'warn' as const } : {}),
           },
           { to: '/abm', text: 'ABM tracker' },
         ]
@@ -182,22 +185,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             ) : (
               <NavLink key={item.to ?? index} to={item.to!} end={item.end}>
                 <span>{item.text}</span>
-                {item.badge ? <span className="pill bad">{item.badge}</span> : null}
+                {item.badge ? (
+                  <span className={`pill ${item.badgeTone ?? 'info'}`}>{item.badge}</span>
+                ) : null}
               </NavLink>
             ),
           )}
         </nav>
 
-        <div className="me">
-          <div className="avatar" aria-hidden="true">
-            {initials(user.fullName)}
-          </div>
-          <div className="who">
-            <b>{user.fullName}</b>
-            <span>{ROLE_LABEL[user.role] ?? user.role}</span>
-          </div>
-        </div>
-        <div className="row" style={{ padding: '0 8px', gap: 8 }}>
+        {/* Actions sit above the divider; who you are signed in as reads last. */}
+        <div className="side-actions row">
           <NotificationBell data={notifications} />
           <ThemeToggle />
           <button
@@ -209,6 +206,16 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             Sign out
           </button>
+        </div>
+
+        <div className="me">
+          <div className="avatar" aria-hidden="true">
+            {initials(user.fullName)}
+          </div>
+          <div className="who">
+            <b>{user.fullName}</b>
+            <span>{ROLE_LABEL[user.role] ?? user.role}</span>
+          </div>
         </div>
       </aside>
 
