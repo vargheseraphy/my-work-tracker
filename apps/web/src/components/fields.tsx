@@ -399,7 +399,13 @@ export function ProofSlot({
 
       {readOnly || mine.length >= 5 ? null : (
         <>
-          <label className="btn btn-sm" style={{ cursor: busy ? 'wait' : 'pointer' }}>
+          {/* Attachments are switched off for now (db/migrations/0012). The control stays on
+              screen, pale and inert, so the feature is visibly "later" rather than missing. */}
+          <span className="btn btn-sm proof-soon" aria-disabled="true" title="Coming later">
+            Attach a screenshot
+          </span>
+          <span className="xs faint">Not yet available</span>
+          <label className="btn btn-sm hidden" style={{ cursor: busy ? 'wait' : 'pointer' }}>
             {busy ? 'Attaching…' : mine.length > 0 ? 'Add another' : 'Attach a screenshot'}
             <input
               ref={input}

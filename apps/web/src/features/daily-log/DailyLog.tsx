@@ -201,9 +201,17 @@ export function DailyLog() {
 
       {data.entry.periodStart < data.today && editable ? (
         <Banner
-          tone="bad"
-          title="You are filling in a missed day"
-          body="It will show as Late on the team dashboard. Today unlocks once this is submitted."
+          tone="info"
+          title="You are filling in an earlier day"
+          body="It will show as late on the team dashboard. Today is not waiting on it."
+        />
+      ) : null}
+
+      {editable ? (
+        <Banner
+          tone="info"
+          title="Put down what actually happened"
+          body="These numbers become the weekly report and the decisions made from it, so an honest zero is far more useful than a rounded-up guess. A quiet day is a normal day."
         />
       ) : null}
 

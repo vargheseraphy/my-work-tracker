@@ -1041,3 +1041,10 @@
 .badge-off .badge-value {
   color: var(--muted);
 }
+
+/* Attachments are off for now: visible, pale and inert, so the feature reads as "later". */
+.proof-soon {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}

@@ -175,6 +175,16 @@ describe('check 2 and 3 · every enabled field needs a whole number, and 0 is fi
 });
 
 describe('check 4 · a file-proof field above 0 needs an attachment', () => {
+  /**
+   * Attachments are switched off in reference data (db/migrations/0012), so no metric asks for
+   * file proof today. The rule itself is unchanged and the feature is meant to come back, so
+   * these tests set the precondition themselves rather than relying on the seed.
+   */
+  beforeEach(async () => {
+    const client = await owner();
+    await client.query("update metric_definitions set proof = 'file' where key = 'comments'");
+  });
+
   it('asks for a screenshot', async () => {
     const { user, agent } = await contributor();
     const screen = await openToday(agent, user);
@@ -607,14 +617,21 @@ describe('working days', () => {
 });
 
 describe('time zones', () => {
-  it('gives two people in different zones a different "today" around midnight', async () => {
-    const early = await makeUser(uniqueEmail('early'), { timezone: tzForLocalHour(23) });
-    const late = await makeUser(uniqueEmail('late'), { timezone: tzForLocalHour(1) });
+  /**
+   * Fixed extreme zones rather than hours derived from the current clock. Deriving them made
+   * this flaky: for part of the day both offsets landed on the same calendar date and the test
+   * failed for reasons that had nothing to do with the code. UTC+14 and UTC-11 are the real
+   * ends of the range, 25 hours apart, so their local dates can never be the same.
+   */
+  it('gives two people in different zones a different "today"', async () => {
+    const ahead = await makeUser(uniqueEmail('ahead'), { timezone: 'Etc/GMT-14' });
+    const behind = await makeUser(uniqueEmail('behind'), { timezone: 'Etc/GMT+11' });
 
-    const earlyToday = await localToday(early.id);
-    const lateToday = await localToday(late.id);
-    expect(earlyToday).not.toBe(lateToday);
-    expect(addDays(earlyToday, 1)).toBe(lateToday);
+    const aheadToday = await localToday(ahead.id);
+    const behindToday = await localToday(behind.id);
+
+    expect(aheadToday).not.toBe(behindToday);
+    expect(aheadToday > behindToday).toBe(true);
   });
 });
 
