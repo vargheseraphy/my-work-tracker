@@ -17,6 +17,7 @@ import {
   readEntry,
   readFields,
   setNoSearchActivity,
+  awardMeetings,
   awardWeekTarget,
   submitEntry,
   upsertValue,
@@ -112,7 +113,11 @@ export async function entriesRoutes(app: FastifyInstance): Promise<void> {
       // A sign-off can be the thing that completes the week. Awarding here, inside the same
       // transaction, means the congratulations and the manager's notification either both
       // happen or neither does (db/migrations/0010).
-      if (result.ok) await awardWeekTarget(client, user.id);
+      if (result.ok) {
+        await awardWeekTarget(client, user.id);
+        // A weekly log is where meetings are recorded, so the meeting moment belongs here.
+        await awardMeetings(client, id);
+      }
       return result;
     });
   });

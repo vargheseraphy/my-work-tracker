@@ -225,6 +225,23 @@ export interface HomeDto {
   streak: StreakDto;
   /** An unread win worth interrupting for. Null almost always. */
   celebration: CelebrationDto | null;
+  badges: BadgeDto[];
+}
+
+/**
+ * Derived from the data every time it is read, never stored, so a badge can never contradict
+ * what it claims. Every one is measured on a lifetime total or a personal best, so nothing a
+ * person has earned can later be taken away.
+ */
+export interface BadgeDto {
+  key: string;
+  label: string;
+  description: string;
+  value: number;
+  /** How many tiers have been passed. 0 means not started. */
+  tier: number;
+  tiers: number[];
+  nextThreshold: number | null;
 }
 
 /**

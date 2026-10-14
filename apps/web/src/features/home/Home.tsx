@@ -29,6 +29,7 @@ import {
 } from '../../components/ui.jsx';
 import { StreakCard } from './StreakCard.jsx';
 import { Celebration } from './Celebration.jsx';
+import { Badges } from './Badges.jsx';
 
 const STATUS_WORD: Record<string, string> = {
   missing: 'Not started',
@@ -211,6 +212,8 @@ export function Home() {
           </Link>
         </Card>
       </div>
+
+      <Badges badges={data.badges} />
 
       {data.abmThisWeek ? (
         <Card tight className="between">

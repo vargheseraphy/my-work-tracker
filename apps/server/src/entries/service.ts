@@ -321,3 +321,16 @@ export async function awardWeekTarget(client: PoolClient, userId: string): Promi
   );
   return row?.awarded ?? false;
 }
+
+/**
+ * Celebrate meetings booked on a submitted weekly log (db/migrations/0011).
+ * Once per week; true only on the run that awarded it.
+ */
+export async function awardMeetings(client: PoolClient, entryId: string): Promise<boolean> {
+  const row = await one<{ awarded: boolean }>(
+    client,
+    'select award_meetings($1) as awarded',
+    [entryId],
+  );
+  return row?.awarded ?? false;
+}

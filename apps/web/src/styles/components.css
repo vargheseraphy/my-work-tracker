@@ -981,3 +981,63 @@
     opacity: 1;
   }
 }
+
+/* ---------- badges ---------- */
+.badges {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface-2);
+}
+.badge-on {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+/* Not started is quiet, never a warning. */
+.badge-off {
+  color: var(--muted);
+}
+.badge-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.badge-text b {
+  font-size: 14px;
+  color: var(--ink);
+}
+.badge-tier {
+  font-weight: 600;
+  color: var(--accent);
+}
+.badge-off .badge-tier {
+  color: var(--muted);
+}
+.badge-note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.badge-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.badge-off .badge-value {
+  color: var(--muted);
+}

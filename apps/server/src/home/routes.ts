@@ -6,6 +6,7 @@
 import type { FastifyInstance } from 'fastify';
 import {
   weekMonday,
+  type BadgeDto,
   type CelebrationDto,
   type HomeDto,
   type StreakDto,
@@ -74,6 +75,7 @@ export async function homeRoutes(app: FastifyInstance): Promise<void> {
         abmThisWeek: owned.find((a) => a.plannedWeek === monday) ?? null,
         streak: await countStreak(client, user.id),
         celebration: await readCelebration(client, user.id),
+        badges: await readBadges(client, user.id),
       };
     });
   });
@@ -166,10 +168,27 @@ async function readCelebration(
     client,
     `select id, title, body
        from notifications
-      where user_id = $1 and rule_key = 'week_target_met' and read_at is null
+      where user_id = $1
+        and rule_key in ('week_target_met', 'meeting_booked')
+        and read_at is null
       order by created_at desc
       limit 1`,
     [userId],
   );
   return row ?? null;
+}
+
+/** Badges are computed in SQL on every read (db/migrations/0011), so they are never stale. */
+async function readBadges(
+  client: Parameters<typeof many>[0],
+  userId: string,
+): Promise<BadgeDto[]> {
+  return many<BadgeDto>(
+    client,
+    `select key, label, description, value, tier, tiers,
+            next_threshold as "nextThreshold"
+       from contributor_badges($1)
+      order by tier desc, key`,
+    [userId],
+  );
 }
