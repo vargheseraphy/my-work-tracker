@@ -5,10 +5,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { App } from './App.jsx';
 import { AuthProvider } from './auth.jsx';
 import { ToastProvider } from './components/Toast.jsx';
+import { initTheme } from './theme.js';
 
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/components.css';
+
+// Before the first render, so the page never flashes the wrong theme.
+initTheme();
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -9,17 +9,14 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, ApiProblem } from '../../api.js';
 import { useAuth } from '../../auth.jsx';
 import { Button, ErrorNote } from '../../components/ui.jsx';
+import { Logo } from '../../components/AppShell.jsx';
 
 function Frame({ children }: { children: ReactNode }) {
   return (
     <div className="signin">
       <section className="hero">
         <div className="lockup">
-          <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="2" y="13" width="5" height="9" rx="1.5" fill="var(--orb-cyan)" />
-            <rect x="9.5" y="8" width="5" height="14" rx="1.5" fill="var(--orb-violet)" />
-            <rect x="17" y="3" width="5" height="19" rx="1.5" fill="var(--accent)" />
-          </svg>
+          <Logo size={34} />
           <span className="t">
             <b>Repotra</b>
           </span>

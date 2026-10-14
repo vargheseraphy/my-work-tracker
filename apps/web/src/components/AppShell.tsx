@@ -3,25 +3,83 @@
  * "Differences from the prototypes"), with live badges for missing days and overdue tasks.
  */
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import type { HomeDto, NotificationsDto } from '@gtm/shared';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { NotificationBell } from './NotificationBell.jsx';
+import { applyTheme, currentTheme, type Theme } from '../theme.js';
 
 /**
- * The Repotra mark: three rising bars, the activity-over-time idea the app is built around.
- * Corners are tight (design/brand-theme) and the fills are tokens, so it follows light and dark.
+ * The Repotra mark: a growth line climbing to an arrow, the activity-over-time idea the app is
+ * built around. Strokes are tokens, so it follows light and dark.
  */
-function Logo({ size = 22 }: { size?: number }) {
+export function Logo({ size = 22 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="2" y="13" width="5" height="9" rx="1.5" fill="var(--orb-cyan)" />
-      <rect x="9.5" y="8" width="5" height="14" rx="1.5" fill="var(--orb-violet)" />
-      <rect x="17" y="3" width="5" height="19" rx="1.5" fill="var(--accent)" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 16.8 9.5 10.3 13.5 14.3 21 6.8V20H3Z" fill="var(--orb-violet)" opacity=".28" />
+      <path
+        d="M3 16.8 9.5 10.3 13.5 14.3 21 6.8"
+        stroke="var(--accent)"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.6 6.8H21v5.4"
+        stroke="var(--accent)"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
+  );
+}
+
+/**
+ * Light or dark, remembered in this browser. It carries a word as well as an icon, so the state
+ * is never signalled by shape alone.
+ */
+function ThemeToggle() {
+  const [theme, setTheme] = useState<Theme>(currentTheme);
+  const dark = theme === 'dark';
+
+  return (
+    <button
+      type="button"
+      className="btn btn-ghost btn-sm"
+      aria-pressed={dark}
+      title={dark ? 'Switch to the light theme' : 'Switch to the dark theme'}
+      onClick={() => {
+        const next: Theme = dark ? 'light' : 'dark';
+        applyTheme(next);
+        setTheme(next);
+      }}
+    >
+      {dark ? (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="2" />
+          <path
+            d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      ) : (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M20 14.2A8.2 8.2 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
+      {dark ? 'Light' : 'Dark'}
+    </button>
   );
 }
 
@@ -141,6 +199,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <div className="row" style={{ padding: '0 8px', gap: 8 }}>
           <NotificationBell data={notifications} />
+          <ThemeToggle />
           <button
             type="button"
             className="btn btn-ghost btn-sm"

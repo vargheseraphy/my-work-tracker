@@ -99,97 +99,42 @@
   color-scheme: light;
 }
 
-/* Dark. The same values under both selectors, so the toggle wins in either direction. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: #070b16;
-    --surface: #0f1626;
-    --surface-2: #17213a;
-    --line: #2b3756;
-    --line-strong: #3c4a6e;
-
-    --ink: #f5f7fc;
-    --ink-2: #e0e6f2;
-    --muted: #c3ccdd;
-
-    --accent: #a79dff;
-    --accent-ink: #0b1424;
-    --accent-tint: #1e1b40;
-    --link: #8cc6ff;
-
-    --good: #6bdca2;
-    --good-bg: #0f3324;
-    --good-line: #1d5c42;
-
-    --warn: #ffbe70;
-    --warn-bg: #3a2610;
-    --warn-line: #6b4518;
-
-    --bad: #ff9a8c;
-    --bad-bg: #3d1713;
-    --bad-line: #6e2a22;
-
-    --info: #aeb9d0;
-    --info-bg: #1a2236;
-    --info-line: #333f5c;
-
-    --c1: #a79dff;
-    --c2: #5cc3ff;
-    --c3: #3fd6c0;
-    --c4: #ffb547;
-    --c5: #ff86c8;
-    --c6: #aeb9d0;
-
-    --orb-violet: #5b45e8;
-    --orb-cyan: #0e86c2;
-    --orb-peach: #c2643c;
-    --orb-pink: #b03a92;
-    --band-from: #0a1020;
-    --band-to: #17123a;
-
-    --glass: rgba(20, 30, 56, 0.5);
-    --glass-edge: rgba(255, 255, 255, 0.22);
-    --glass-sheen: rgba(255, 255, 255, 0.1);
-    --pat: rgba(167, 157, 255, 0.32);
-
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.55);
-
-    color-scheme: dark;
-  }
-}
-
+/* Dark is opt-in only, set <html data-theme="dark">. The app does not follow the system
+   setting: the light theme is the designed default and is the easier of the two to read. */
+/* A soft neutral grey, in the manner of a code editor or Teams, rather than the manual's deep
+   navy: easier to sit in front of for a working day. The accent, status and chart hues are the
+   manual's dark values, so the brand still reads. Every text tone clears 7:1 on its surface. */
 :root[data-theme='dark'] {
-  --bg: #070b16;
-  --surface: #0f1626;
-  --surface-2: #17213a;
-  --line: #2b3756;
-  --line-strong: #3c4a6e;
+  --bg: #1e2023;
+  --surface: #26292d;
+  --surface-2: #2f3338;
+  --line: #3c4046;
+  --line-strong: #4b5057;
 
-  --ink: #f5f7fc;
-  --ink-2: #e0e6f2;
-  --muted: #c3ccdd;
+  --ink: #eceef1;
+  --ink-2: #d2d6db;
+  --muted: #a8aeb6;
 
   --accent: #a79dff;
-  --accent-ink: #0b1424;
-  --accent-tint: #1e1b40;
+  --accent-ink: #1e2023;
+  --accent-tint: #302c52;
   --link: #8cc6ff;
 
   --good: #6bdca2;
-  --good-bg: #0f3324;
-  --good-line: #1d5c42;
+  --good-bg: #1d3328;
+  --good-line: #2e5c45;
 
   --warn: #ffbe70;
-  --warn-bg: #3a2610;
-  --warn-line: #6b4518;
+  --warn-bg: #3a2d18;
+  --warn-line: #5f4a24;
 
   --bad: #ff9a8c;
-  --bad-bg: #3d1713;
-  --bad-line: #6e2a22;
+  --bad-bg: #3b211d;
+  --bad-line: #5e3630;
 
   --info: #aeb9d0;
-  --info-bg: #1a2236;
-  --info-line: #333f5c;
+  --info-bg: #262b33;
+  --info-line: #3a4150;
 
   --c1: #a79dff;
   --c2: #5cc3ff;
@@ -202,16 +147,16 @@
   --orb-cyan: #0e86c2;
   --orb-peach: #c2643c;
   --orb-pink: #b03a92;
-  --band-from: #0a1020;
-  --band-to: #17123a;
+  --band-from: #26282d;
+  --band-to: #2f2b3d;
 
-  --glass: rgba(20, 30, 56, 0.5);
-  --glass-edge: rgba(255, 255, 255, 0.22);
-  --glass-sheen: rgba(255, 255, 255, 0.1);
-  --pat: rgba(167, 157, 255, 0.32);
+  --glass: rgba(45, 48, 54, 0.55);
+  --glass-edge: rgba(255, 255, 255, 0.14);
+  --glass-sheen: rgba(255, 255, 255, 0.07);
+  --pat: rgba(167, 157, 255, 0.22);
 
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.55);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 12px 34px rgba(0, 0, 0, 0.42);
 
   color-scheme: dark;
 }

@@ -779,22 +779,36 @@
 }
 
 /* ---------- sign in (design/signin.html) ---------- */
+/* Aurora Mesh ground: cyan top-left, pink top-right, violet bottom, over a white to lavender
+   wash (design/brand-theme, "Backgrounds"). The whole page carries it so the form card has a
+   colour ground to be glass on. */
 .signin {
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  background:
+    radial-gradient(
+      58% 48% at 10% 6%,
+      color-mix(in srgb, var(--orb-cyan) 62%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      52% 42% at 94% 4%,
+      color-mix(in srgb, var(--orb-pink) 52%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      66% 52% at 46% 106%,
+      color-mix(in srgb, var(--orb-violet) 58%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(165deg, var(--band-from) 10%, var(--band-to));
 }
 .signin .hero {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
   padding: 64px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  /* Line grid from the brand manual. --pat carries its own tone per theme. */
-  background-image: linear-gradient(var(--pat) 1px, transparent 1px),
-    linear-gradient(90deg, var(--pat) 1px, transparent 1px);
-  background-size: 24px 24px;
 }
 /* The mark sits at the top, the message is centred in whatever space is left. */
 .signin .hero .stack {
@@ -827,9 +841,17 @@
   justify-content: center;
   padding: 32px 16px;
 }
+/* Frosted glass, the brand's one hero element on this screen. It only works because the page
+   behind it is an aurora ground; on a plain canvas this reads as a dirty white box. */
 .signin .box {
   width: 420px;
   max-width: 100%;
+  background: linear-gradient(140deg, var(--glass-sheen), transparent 45%), var(--glass);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-panel);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 var(--glass-edge);
 }
 @media (max-width: 900px) {
   .signin {
