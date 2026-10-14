@@ -170,7 +170,13 @@ export async function upsertValue(
   client: PoolClient,
   entryId: string,
   metricKey: string,
-  value: { numValue?: number | null; textValue?: string | null; note?: string | null },
+  value: {
+    numValue?: number | null;
+    textValue?: string | null;
+    note?: string | null;
+    /** Null for a measure that is not split by brand (db/migrations/0013). */
+    brandId?: string | null;
+  },
 ): Promise<EntryValueDto> {
   const row = await one<{
     metricKey: string;
@@ -180,15 +186,17 @@ export async function upsertValue(
     updatedAt: Date;
   }>(
     client,
-    `insert into entry_values (entry_id, metric_key, num_value, text_value, note)
-     values ($1, $2, $3, $4, $5)
-     on conflict (entry_id, metric_key) do update set
+    // Named constraint, not a column list: the key treats nulls as equal (nulls not distinct),
+    // which a plain inference list cannot express.
+    `insert into entry_values (entry_id, metric_key, num_value, text_value, note, brand_id)
+     values ($1, $2, $3, $4, $5, $9)
+     on conflict on constraint entry_values_key do update set
        num_value  = case when $6 then excluded.num_value  else entry_values.num_value  end,
        text_value = case when $7 then excluded.text_value else entry_values.text_value end,
        note       = case when $8 then excluded.note       else entry_values.note       end,
        updated_at = now()
      returning metric_key as "metricKey", num_value as "numValue", text_value as "textValue",
-               note, updated_at as "updatedAt"`,
+               note, brand_id as "brandId", updated_at as "updatedAt"`,
     [
       entryId,
       metricKey,
@@ -198,6 +206,7 @@ export async function upsertValue(
       value.numValue !== undefined,
       value.textValue !== undefined,
       value.note !== undefined,
+      value.brandId ?? null,
     ],
   );
   return { ...row!, updatedAt: row!.updatedAt.toISOString() };
