@@ -75,8 +75,9 @@ async function openToday(agent: Agent, user: TestUser): Promise<EntryScreenDto> 
 }
 
 /**
- * Sign off every missing working day inside the backfill window, so check 9 ("a missed day
- * blocks today") does not mask the rule a test is actually about.
+ * Sign off every missing working day inside the backfill window, so a test starts from a clean
+ * history. Since 0009 a missing day no longer blocks today, so this is tidiness rather than a
+ * precondition; it keeps the error lists in these tests short and about one rule at a time.
  */
 async function clearBacklog(user: TestUser): Promise<void> {
   const client = await owner();
@@ -355,22 +356,28 @@ describe('check 8 · an open task due that day needs a status update', () => {
   });
 });
 
-describe('check 9 · a missed working day blocks today', () => {
-  it('names each missing day in the database wording', async () => {
+describe('DAY-07 · a missed working day no longer blocks today', () => {
+  /**
+   * Softened in db/migrations/0009. Blocking today because an earlier day was missed suppressed
+   * the very logging the tool exists to collect. The day still shows as missing to the person
+   * and to the manager; it simply no longer locks anything.
+   */
+  it('lets today through with earlier working days still missing', async () => {
     const { user, agent } = await contributor();
-    const today = await localToday(user.id);
-    // Two working days back, with nothing submitted, so both are inside the window.
+    // Two working days back with nothing submitted, which used to refuse the submit outright.
     const screen = await openToday(agent, user);
     await fillZeroes(agent, screen);
 
     const result = await submit(agent, screen.entry.id);
-    expect(result.ok).toBe(false);
+    expect(result.ok).toBe(true);
     if (!result.ok) {
-      const order = result.errors.filter((e) => e.startsWith('Submit '));
-      expect(order).toHaveLength(2);
-      expect(order[0]).toMatch(/^Submit \w{3} \d{2} \w{3} first$/);
-      expect(result.errors.join(' ')).toContain(shortDay(addDays(today, -1)));
+      expect(result.errors.filter((e) => e.startsWith('Submit '))).toHaveLength(0);
     }
+
+    // The gap is still visible, so nothing is hidden from the dashboard.
+    const client = await owner();
+    const missing = await client.query('select 1 from missing_days($1) d limit 1', [user.id]);
+    expect(missing.rowCount).toBe(1);
   });
 
   it('lets today through once the missed days are filled', async () => {
@@ -750,13 +757,6 @@ function addDays(day: string, n: number): string {
   const d = new Date(`${day}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
-}
-
-function shortDay(day: string): string {
-  const d = new Date(`${day}T00:00:00Z`);
-  const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${names[d.getUTCDay()]} ${String(d.getUTCDate()).padStart(2, '0')} ${months[d.getUTCMonth()]}`;
 }
 
 /** The nearest day with the given ISO weekday, searching in `direction`. */

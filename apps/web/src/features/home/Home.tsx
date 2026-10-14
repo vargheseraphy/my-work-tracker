@@ -65,7 +65,6 @@ export function Home() {
   const overdueCount = data.openTasks.filter((t) => t.isOverdue).length;
   const todayCount = data.openTasks.filter((t) => t.isDueToday).length;
 
-  const dayLocked = data.backfillDays.length > 0;
 
   return (
     <>
@@ -73,10 +72,9 @@ export function Home() {
 
       {firstMissing ? (
         <Banner
-          tone="bad"
-          role="alert"
-          title={`${formatDayLong(firstMissing)} is missing`}
-          body="Fill it in first. Today's log stays locked until it is submitted, and it will be marked late."
+          tone="info"
+          title={`${formatDayLong(firstMissing)} is still open`}
+          body="Today is not held up by it. Add it when you have a moment and it will be marked late."
           action={
             <LinkButton to={`/daily/${firstMissing}`}>
               Fill {formatDayShort(firstMissing)}
@@ -96,12 +94,10 @@ export function Home() {
           note={
             !data.todayIsWorkingDay
               ? 'Nothing is due from you today.'
-              : dayLocked
-                ? 'Locked until the missing day is submitted'
-                : 'Due 7pm, in your own time zone'
+              : 'Due 7pm, in your own time zone'
           }
           action={
-            <LinkButton to="/daily" tone={dayLocked || !data.todayIsWorkingDay ? 'default' : 'primary'}>
+            <LinkButton to="/daily" tone={data.todayIsWorkingDay ? 'primary' : 'default'}>
               Open daily log
             </LinkButton>
           }
